@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hng/constants/app_strings.dart';
+import 'package:hng/ui/nav_pages/plugin_page/plugin_page_view.dart';
+import 'package:hng/utilities/internalization/localization/app_localization.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../general_widgets/svg_icon.dart';
 import '../../nav_pages/dm_page/dm_page.dart';
 import '../../nav_pages/home_page/home_page.dart';
-import '../../nav_pages/you_page/you_page_view.dart';
+import '../../nav_pages/you_page/you_page.dart';
 import '../../shared/colors.dart';
 import '../../shared/shared.dart';
 import 'nav_bar_viewmodel.dart';
@@ -44,18 +45,24 @@ class NavBarView extends StatelessWidget {
             unselectedLabelStyle: AppTextStyles.normalText,
             currentIndex: vModel.currentIndex,
             onTap: vModel.setIndex,
-            items: getBottomIcons(),
+            items: getBottomIcons(context),
           ),
         );
       },
     );
   }
 
-  List<BottomNavigationBarItem> getBottomIcons() {
-    List<String> name = [Home, DmTitle, You];
-    List<SvgData> icons = [SvgAssets.home, SvgAssets.dm, SvgAssets.you];
+  List<BottomNavigationBarItem> getBottomIcons(context) {
+    final local = AppLocalization.of(context);
+    List<String> name = [local!.homeNavBar, local.pluginsNavBar, local.dmNavBar, local.youNavBar];
+    List<SvgData> icons = [
+      SvgAssets.home,
+      SvgAssets.plugin,
+      SvgAssets.dm,
+      SvgAssets.you
+    ];
 
-    List<BottomNavigationBarItem> bottomNavList = List.generate(3, (i) {
+    List<BottomNavigationBarItem> bottomNavList = List.generate(4, (i) {
       var item = BottomNavigationBarItem(
         label: name[i],
         icon: SvgIcon(
@@ -108,13 +115,13 @@ class NavBarView extends StatelessWidget {
       case 0:
         return const HomePage();
       case 1:
-        return const DmPage();
-      // case 2:
-      //   return const IntegratePage();
+        return const PluginPage();
       case 2:
+        return const DmPage();
+      case 3:
         return const YouPage();
       default:
-        return Container();
+        return const HomePage();
     }
   }
 }

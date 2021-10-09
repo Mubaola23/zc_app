@@ -5,7 +5,6 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked/stacked_annotations.dart';
 
-import '../../../app/app.logger.dart';
 import '../../../general_widgets/custom_text.dart';
 import '../../../general_widgets/custom_textfield.dart';
 import '../../shared/colors.dart';
@@ -28,7 +27,7 @@ import 'sign_up_viewmodel.dart';
   ],
 )
 class SignUpView extends StatelessWidget with $SignUpView {
-  final log = getLogger('SignUpView');
+  SignUpView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +82,32 @@ class SignUpView extends StatelessWidget with $SignUpView {
                       ),
                       UIHelper.customVerticalSpace(48),
                       Text(
+                        FirstName,
+                        style: AppTextStyles.body1Bold,
+                      ),
+                      UIHelper.customVerticalSpace(10),
+                      CustomTextField(
+                        keyboardType: TextInputType.name,
+                        inputAction: TextInputAction.next,
+                        autoCorrect: false,
+                        obscureText: false,
+                        controller: firstNameController,
+                        hintText: FirstNameHintText,
+                      ),
+                      UIHelper.verticalSpaceLarge, Text(
+                        LastName,
+                        style: AppTextStyles.body1Bold,
+                      ),
+                      UIHelper.customVerticalSpace(10),
+                      CustomTextField(
+                        keyboardType: TextInputType.name,
+                        inputAction: TextInputAction.next,
+                        autoCorrect: false,
+                        obscureText: false,
+                        controller: lastNameController,
+                        hintText: LastNameHintText,
+                      ),
+                      UIHelper.verticalSpaceLarge, Text(
                         EmailAddress,
                         style: AppTextStyles.body1Bold,
                       ),
@@ -139,16 +164,20 @@ class SignUpView extends StatelessWidget with $SignUpView {
                                 text: TnC1,
                                 fontSize: 14,
                               ),
-                              const Text(
-                                TnC2,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: AppColors.zuriPrimaryColor,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: AppColors.zuriPrimaryColor,
-                                  decorationStyle: TextDecorationStyle.solid,
-                                  decorationThickness: 2,
+                              GestureDetector(
+                                onTap: () =>
+                                    model.navigateToTermsAndConditions(),
+                                child: const Text(
+                                  TnC2,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: AppColors.zuriPrimaryColor,
+                                    fontWeight: FontWeight.bold,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: AppColors.zuriPrimaryColor,
+                                    decorationStyle: TextDecorationStyle.solid,
+                                    decorationThickness: 2,
+                                  ),
                                 ),
                               ),
                             ],
@@ -196,9 +225,7 @@ class SignUpView extends StatelessWidget with $SignUpView {
                           ),
                         ),
                         child: InkWell(
-                          onTap: () {
-                            log.i(' chiboy clicked');
-                          },
+                          onTap: () {},
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

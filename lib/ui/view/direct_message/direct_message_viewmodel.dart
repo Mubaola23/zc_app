@@ -1,6 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:hng/app/app.locator.dart';
 import 'package:stacked/stacked.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 class DirectMessageViewModel extends BaseViewModel {
-  TextEditingController controller = new TextEditingController();
+  final _navigationService = locator<NavigationService>();
+
+  navigateBack() {
+    _navigationService.back();
+  }
 }

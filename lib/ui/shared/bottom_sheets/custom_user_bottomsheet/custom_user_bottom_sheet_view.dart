@@ -64,12 +64,14 @@ class CustomUserBottomSheetView extends StatelessWidget {
                         const CustomProfileTile(
                             title: Track, subtitle: MobileDev),
                         const Divider(),
-                        const CustomProfileTile(
-                            title: DisplayName, subtitle: PaulEke),
+                        CustomProfileTile(
+                          title: DisplayName,
+                          subtitle: model.userModel!.displayName ?? '',
+                        ),
                         const Divider(),
                         ListTile(
                           title: const CustomText(
-                              text: Status, fontWeight: FontWeight.w300),
+                              text: StatusText, fontWeight: FontWeight.w300),
                           subtitle: const Align(
                               alignment: Alignment.centerLeft,
                               child: Icon(Icons.looks_5,
@@ -80,14 +82,20 @@ class CustomUserBottomSheetView extends StatelessWidget {
                           ),
                           onTap: () => model.navigateToSetStatus(),
                           trailing: IconButton(
-                              onPressed: () {}, icon: const Icon(Icons.cancel)),
+                            onPressed: () {},
+                            icon: const Icon(Icons.cancel),
+                          ),
                         ),
                         const Divider(),
-                        const CustomProfileTile(
-                            title: Number, subtitle: sampleNumber),
+                        CustomProfileTile(
+                          title: Number,
+                          subtitle: model.userModel!.phoneNumber ?? '',
+                        ),
                         const Divider(),
-                        const CustomProfileTile(
-                            title: EmailAddress, subtitle: EmailPlaceholder),
+                        CustomProfileTile(
+                          title: EmailAddress,
+                          subtitle: model.userModel!.email!,
+                        ),
                       ],
                     ),
                   ),

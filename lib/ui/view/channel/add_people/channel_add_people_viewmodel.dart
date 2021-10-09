@@ -11,22 +11,23 @@ import 'package:stacked_services/stacked_services.dart';
 class ChannelAddPeopleViewModel extends BaseViewModel {
   final organizationApi = OrganizationApiService();
   final storageService = locator<SharedPreferenceLocalStorage>();
-  final _navigationService = locator<NavigationService>();
-  // final api = HttpApiService("https://channels.zuri.chat/api/v1");
-  final api = ZuriApi(baseUrl: channelsBaseUrl);
+  final navigationService = locator<NavigationService>();
+  final api = ZuriApi(channelsBaseUrl);
+
+  String? get orgId => storageService.getString(StorageKeys.currentOrgId);
+
+  String? get token =>
+      storageService.getString(StorageKeys.currentSessionToken);
 
   bool get allMarked =>
       markedUsers.length == matchingUsers.length && matchingUsers.isNotEmpty;
 
   late List<UserSearch> matchingUsers = [];
   late List<UserSearch> markedUsers = [];
+  late List<UserSearch> users = [];
 
-  String? get token =>
-      storageService.getString(StorageKeys.currentSessionToken);
+  void navigateBack() => navigationService.popRepeated(1);
 
-  List<UserSearch> users = [];
-
-  navigateBack() => _navigationService.popRepeated(1);
   void onSearchUser(String input) {
     matchingUsers = [
       ...users.where(
@@ -35,55 +36,37 @@ class ChannelAddPeopleViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void onFetchMembers() async {
+  void onMarkAll(bool? marked) {
+    markedUsers = marked! ? [...matchingUsers] : [];
+    notifyListeners();
+  }
+
+  void addMarkedUsersToChannel(String channelId) async {
+    if (markedUsers.isNotEmpty) {
+      setBusy(true);
+      for (final user in markedUsers) {
+        await api.addMemberToChannel(channelId, orgId!, user.id!, token);
+      }
+      setBusy(false);
+      navigateBack();
+    }
+  }
+
+  void fetchOrganizationMembers() async {
     setBusy(true);
     matchingUsers =
-        users = await organizationApi.fetchMembersInOrganization(orgId!);
+        users = (await organizationApi.fetchMembersInOrganization(orgId!))
+          ..sort((user1, user2) =>
+              user1.userName!.trim().compareTo(user2.userName!.trim()));
     setBusy(false);
   }
 
-// ignore: todo
-//TODO: Change channelID
-  void onAddButtonTap() async {
-    setBusy(true);
-    for (var user in markedUsers) {
-      await addMemberToChannel("6148c952e4b2aebf8ec8ccd0", user.id!);
-      print(user.id);
-    }
-    setBusy(false);
-    _navigationService.popRepeated(1);
-  }
-
-  Future<void> addMemberToChannel(String channelId, String userId) async {
-    await api.post(
-      "/$orgId/channels/$channelId/members/",
-      //  "/614679ee1a5607b13c00bcb7/channels/$channelId/members/",
-      token: token,
-      body: {
-        "_id": userId,
-        "role_id": "",
-        "is_admin": false,
-        "notifications": {
-          "additionalProp1": "",
-          "additionalProp2": "",
-          "additionalProp3": ""
-        }
-      },
-    );
-  }
-
-  void onMarkOne(bool? marked, int i) {
-    if (marked!)
+  void markOne(bool? marked, int i) {
+    if (marked!) {
       markedUsers.add(matchingUsers[i]);
-    else
+    } else {
       markedUsers.remove(matchingUsers[i]);
+    }
     notifyListeners();
   }
-
-  void onMarkAll(bool? marked) {
-    markedUsers = marked! ? matchingUsers : [];
-    notifyListeners();
-  }
-
-  String? get orgId => storageService.getString(StorageKeys.currentOrgId);
 }

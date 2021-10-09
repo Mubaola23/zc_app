@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hng/constants/app_strings.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_hooks/stacked_hooks.dart';
 
@@ -11,7 +12,7 @@ class NewEmailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<NewEmailViewModel>.nonReactive(
-      builder: (context, model, child) => Scaffold(
+      builder: (context, viewModel, child) => Scaffold(
         body: SafeArea(
           child: SingleChildScrollView(
             child: Padding(
@@ -22,12 +23,11 @@ class NewEmailView extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsets.only(top: 300),
                     child: Column(
-                      children: <Widget>[
-                        const TextForm(),
-                        const SizedBox(height: 12),
-                        const Text(
-                          '''We’ll send you an email that will '''
-                          '''instantly sign you in''',
+                      children: const [
+                        TextForm(),
+                        SizedBox(height: 12),
+                        Text(
+                          WillSendEmail,
                           style: TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 16,
@@ -52,12 +52,13 @@ class NewEmailView extends StatelessWidget {
 class TextForm extends HookViewModelWidget<NewEmailViewModel> {
   const TextForm({Key? key}) : super(key: key, reactive: false);
   @override
-  Widget buildViewModelWidget(BuildContext context, NewEmailViewModel model) {
+  Widget buildViewModelWidget(
+      BuildContext context, NewEmailViewModel viewModel) {
     return Center(
       child: TextField(
         decoration: const InputDecoration(
-          labelText: 'Your email address',
-          hintText: 'Your email address',
+          labelText: YourEmail,
+          hintText: YourEmail,
           hintStyle: TextStyle(
             color: Color(0xffBEBEBE),
             fontSize: 16,
@@ -70,7 +71,7 @@ class TextForm extends HookViewModelWidget<NewEmailViewModel> {
           disabledBorder: InputBorder.none,
         ),
         onChanged: (value) {
-          model.updateString(value);
+          viewModel.updateString(value);
         },
       ),
     );
@@ -81,14 +82,15 @@ class NextButton extends ViewModelWidget<NewEmailViewModel> {
   const NextButton({Key? key}) : super(key: key, reactive: true);
 
   @override
-  Widget build(BuildContext context, NewEmailViewModel model) {
+  Widget build(BuildContext context, NewEmailViewModel viewModel) {
     return TextButton(
         style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(model.text.isEmpty
-                // ignore: todo
-                //TODO Change to brand colors
-                ? const Color(0xffBEBEBE)
-                : AppColors.appBarGreen)),
+            backgroundColor:
+                MaterialStateProperty.all<Color>(viewModel.text.isEmpty
+
+                    //TODO Change to brand colors
+                    ? const Color(0xffBEBEBE)
+                    : AppColors.appBarGreen)),
         onPressed: () {},
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
@@ -96,7 +98,7 @@ class NextButton extends ViewModelWidget<NewEmailViewModel> {
             width: 300,
             child: Center(
               child: Text(
-                'Next',
+                Next,
                 style: AppTextStyles.buttonText,
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hng/constants/app_strings.dart';
 import '../../../shared/colors.dart';
 import '../../../shared/long_button.dart';
 import '../../../shared/text_field.dart';
@@ -8,14 +9,21 @@ import 'package:stacked/stacked.dart';
 import 'create_organization_viewmodel.dart';
 
 class CompanyPage extends ViewModelWidget<CreateOrganizationViewModel> {
-  final String email;
+  final PageController pageController;
   const CompanyPage({
     Key? key,
-    required this.email,
+    required this.pageController,
   }) : super(key: key);
 
+  void next() {
+    pageController.nextPage(
+      duration: const Duration(seconds: 1),
+      curve: Curves.ease,
+    );
+  }
+
   @override
-  Widget build(BuildContext context, CreateOrganizationViewModel model) {
+  Widget build(BuildContext context, CreateOrganizationViewModel viewModel) {
     return LayoutBuilder(
       builder: (context, constraint) {
         return SingleChildScrollView(
@@ -35,7 +43,7 @@ class CompanyPage extends ViewModelWidget<CreateOrganizationViewModel> {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: const Text(
-                        "What's the name of the\ncompany or team?",
+                        CompanyName,
                         style: TextStyle(
                           letterSpacing: 0.5,
                           color: AppColors.blackColor,
@@ -46,26 +54,29 @@ class CompanyPage extends ViewModelWidget<CreateOrganizationViewModel> {
                       ),
                     ),
                     BorderTextField(
-                      controller: model.companyController,
-                      hint: 'Eg.  HNG I8 / Team Socrates',
+                      hint: CompanyNameHint,
+                      onChanged: (val) => viewModel.updateData(comp: val),
                     ),
                     UIHelper.verticalSpaceMedium,
                     LongButton(
-                        onPressed: () => model.onCompanyNext(email),
+                        onPressed: () async {
+                          final res = await viewModel.onCompanyNext();
+                          if (res) next();
+                        },
                         label: 'Next'),
                     const SizedBox(height: 15),
                     const Text.rich(
                       TextSpan(
                         children: [
                           TextSpan(
-                            text: 'By continuing, you are agreeing to our ',
+                            text: TnC1,
                             style: TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 16,
                             ),
                           ),
                           TextSpan(
-                            text: 'Customer’s Term of Service, Privacy Policy',
+                            text: TnC2,
                             style: TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 16,
@@ -80,7 +91,7 @@ class CompanyPage extends ViewModelWidget<CreateOrganizationViewModel> {
                             ),
                           ),
                           TextSpan(
-                            text: 'Cookie Policy',
+                            text: CookiePolicy,
                             style: TextStyle(
                               fontWeight: FontWeight.w400,
                               fontSize: 16,
@@ -95,12 +106,11 @@ class CompanyPage extends ViewModelWidget<CreateOrganizationViewModel> {
                       child: CheckboxListTile(
                         contentPadding: EdgeInsets.zero,
                         activeColor: AppColors.zuriPrimaryColor,
-                        value: model.checkBoxVal,
-                        onChanged: model.onCheckBoxChanged,
+                        value: viewModel.checkBoxVal,
+                        onChanged: viewModel.onCheckBoxChanged,
                         controlAffinity: ListTileControlAffinity.leading,
                         title: const Text(
-                          '''It’s okay to send me email '''
-                          '''with slack app, news and offer''',
+                          CustomerAgreementText,
                           style: TextStyle(
                             fontSize: 15,
                           ),

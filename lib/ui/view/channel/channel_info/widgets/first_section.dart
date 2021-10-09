@@ -1,73 +1,76 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hng/constants/app_strings.dart';
 import 'package:hng/ui/shared/shared.dart';
 import 'package:hng/ui/view/channel/channel_info/channel_info_view_model.dart';
 import '../../../../shared/colors.dart';
 
 class FirstSection extends StatelessWidget {
-  const FirstSection(this.model);
+  const FirstSection(this.model, {Key? key}) : super(key: key);
   final ChannelInfoViewModel model;
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 284.h,
-      width: 395.w,
+      height: 380,
+      width: double.infinity,
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(6.r),
-          border: Border.all(width: 1.w, color: AppColors.borderColor),
-          boxShadow: [
+          borderRadius: BorderRadius.circular(6),
+          boxShadow: const [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 5.r,
-              blurRadius: 6.r,
-              offset: Offset(0, 3), // changes position of shadow
+              color: AppColors.whiteColor,
+              spreadRadius: 4,
+              blurRadius: 4,
+              offset: Offset(3, 3), // changes position of shadow
             ),
-          ]
-      ),
-      padding: EdgeInsets.fromLTRB(16.37.w, 24.h, 24.h,16.37.w),
+          ]),
+      // margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            // "$channelName",
             "#${model.channelName}",
-            style: AppTextStyles.body1Light,
+            style: AppTextStyles.body1Bold,
           ),
+          const SizedBox(height: 25),
           Text(
-            'Description',
-            style: AppTextStyles.body1Light,
+            Description,
+            style: AppTextStyles.body1Bold,
           ),
-          SizedBox(height: 24.h),
+          const SizedBox(height: 10),
           Text(
             '${model.channelDescription}',
-            style: AppTextStyles.body1Light.copyWith(letterSpacing:0.005 ),
+            style: AppTextStyles.body1Light.copyWith(letterSpacing: 0.005),
           ),
-          SizedBox(height: 6.h),
+          const SizedBox(height: 10),
           Text(
-            'Mark created this channel on August 13.',
-            style: AppTextStyles.body1Regular.copyWith(letterSpacing:0.005 ),
+            MarkCreatedChannel,
+            style: AppTextStyles.body1Regular.copyWith(letterSpacing: 0.005),
           ),
-          SizedBox(height: 18.h),
+          const SizedBox(height: 20),
           Text(
-            'Topic',
+            Topic,
             style: AppTextStyles.headerStyle1.copyWith(fontSize: 16.sp),
           ),
-          SizedBox(height: 10.h),
+          const SizedBox(height: 10),
           Text(
-              'Creating the zuri main app',
-              style: AppTextStyles.body1Light.copyWith(fontSize: 16.sp),
-            ),
-          SizedBox(height: 26.h),
-          Divider(thickness: 0.5.h, color: AppColors.borderColor,),
-          SizedBox(height: 16.h),
+            CreatingZuri,
+            style: AppTextStyles.body1Light.copyWith(fontSize: 16.sp),
+          ),
+          const SizedBox(height: 25),
+          const Divider(
+            thickness: 0.5,
+            color: AppColors.borderColor,
+          ),
+          const SizedBox(height: 15),
           Center(
             child: InkWell(
-              onTap: (){
+              onTap: () {
                 model.navigateToEditChannel();
               },
               child: Text(
-                'Edit',
+                Edit,
                 style: AppTextStyles.bodyBig..copyWith(fontSize: 16.sp),
               ),
             ),

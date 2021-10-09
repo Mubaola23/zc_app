@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hng/constants/app_strings.dart';
 import 'package:hng/ui/shared/colors.dart';
 import 'package:hng/ui/shared/styles.dart';
+import 'package:hng/ui/shared/zuri_appbar.dart';
 import 'package:stacked/stacked.dart';
 
 import 'channel_notification_viewmodel.dart';
 
 class ChannelNotificationView extends StatelessWidget {
+  const ChannelNotificationView({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ChannelNotificationViewModel>.reactive(
@@ -13,11 +16,10 @@ class ChannelNotificationView extends StatelessWidget {
       builder: (context, model, child) {
         return SafeArea(
           child: Scaffold(
-            appBar: const ZuriAppBar(
-              60,
-              'Notifications',
-              subtitle: 'Settings for #teamsocrates',
-              icon: Icons.chevron_left,
+            appBar: ZuriAppBar(
+              title: Notifications,
+              subtitle: ChannelNotifSubtitle,
+              leading: Icons.chevron_left,
             ),
             body: Column(
               children: [
@@ -26,8 +28,8 @@ class ChannelNotificationView extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.whiteColor,
                     borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      const BoxShadow(
+                    boxShadow: const [
+                      BoxShadow(
                         color: AppColors.shadowColor,
                         blurRadius: 5,
                       ),
@@ -37,21 +39,21 @@ class ChannelNotificationView extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       _buildOption(
-                        'Every new message',
-                        'new',
+                        EveryNewMessage,
+                        New,
                         '${model.value}',
                         (val) => model.toggleOptions(val),
                         false,
                       ),
                       _buildOption(
-                        'Just @mentions',
-                        'mentions',
+                        JustMentions,
+                        Mentions,
                         '${model.value}',
                         (val) => model.toggleOptions(val),
                       ),
                       _buildOption(
-                        'Nothing',
-                        'none',
+                        Nothing,
+                        None,
                         '${model.value}',
                         (val) => model.toggleOptions(val),
                       ),
@@ -62,7 +64,7 @@ class ChannelNotificationView extends StatelessWidget {
                   margin: const EdgeInsets.only(left: 16),
                   width: double.infinity,
                   child: Text(
-                    'This setting only applies to #teamsocrates channel.',
+                    ChannelNotifSettings,
                     style: AppTextStyles.body2Medium,
                   ),
                 )
@@ -93,85 +95,6 @@ class ChannelNotificationView extends StatelessWidget {
             color: AppColors.deepBlackColor,
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ZuriAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final double height;
-  final String title;
-  final String? subtitle;
-  final IconData? icon;
-  final VoidCallback? onIconTap;
-  final String? buttonText;
-  final VoidCallback? onButtanTap;
-
-  const ZuriAppBar(
-    this.height,
-    this.title, {
-    this.subtitle,
-    this.icon,
-    this.onIconTap,
-    this.buttonText,
-    this.onButtanTap,
-  });
-
-  @override
-  Size get preferredSize => Size.fromHeight(height);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowColor,
-            blurRadius: 5,
-          )
-        ],
-      ),
-      child: Row(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: IconButton(
-              icon: Icon(this.icon, size: 25, color: AppColors.deepBlackColor),
-              onPressed: this.onIconTap,
-            ),
-          ),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  '$title',
-                  style: AppTextStyles.heading6.copyWith(
-                    color: AppColors.deepBlackColor,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                if (subtitle != null)
-                  Text(
-                    '$subtitle',
-                    style: AppTextStyles.body1Regular,
-                  ),
-              ],
-            ),
-          ),
-          if (this.buttonText != null)
-            TextButton(
-              onPressed: onButtanTap,
-              child: Text(
-                '$buttonText',
-                style: AppTextStyles.heading5.copyWith(
-                  color: Colors.green,
-                ),
-              ),
-            ),
-        ],
       ),
     );
   }

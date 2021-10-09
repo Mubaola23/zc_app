@@ -7,14 +7,12 @@ import '../../../../utilities/utilities.dart';
 class CustomInputChip extends StatelessWidget {
   final String imageUrl;
   final String name;
-  @override
-  final Key key;
 
-  CustomInputChip({
+  const CustomInputChip({
+    Key? key,
     required this.imageUrl,
     required this.name,
-    required this.key,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +24,19 @@ class CustomInputChip extends StatelessWidget {
           key: key,
           hoverColor: Colors.red,
           splashColor: Colors.red,
-          onTap: () => print('i'),
+          onTap: () {},
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                  height: 32,
-                  width: 30,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(3),
-                      image: DecorationImage(
-                          image: makeNetworkImage(imageUrl),
-                          fit: BoxFit.cover))),
+                height: 32,
+                width: 30,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                  image: DecorationImage(
+                      image: makeNetworkImage(imageUrl), fit: BoxFit.cover),
+                ),
+              ),
               Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(name,

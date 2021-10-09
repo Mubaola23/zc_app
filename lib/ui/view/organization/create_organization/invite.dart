@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:hng/constants/app_strings.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../shared/colors.dart';
@@ -11,12 +12,21 @@ import '../../../shared/ui_helpers.dart';
 import 'create_organization_viewmodel.dart';
 
 class InvitePage extends ViewModelWidget<CreateOrganizationViewModel> {
+  final PageController pageController;
   const InvitePage({
     Key? key,
+    required this.pageController,
   }) : super(key: key);
 
+  void next() {
+    pageController.nextPage(
+      duration: const Duration(seconds: 1),
+      curve: Curves.ease,
+    );
+  }
+
   @override
-  Widget build(BuildContext context, CreateOrganizationViewModel model) {
+  Widget build(BuildContext context, CreateOrganizationViewModel viewModel) {
     return LayoutBuilder(
       builder: (context, constraint) {
         return SingleChildScrollView(
@@ -36,7 +46,7 @@ class InvitePage extends ViewModelWidget<CreateOrganizationViewModel> {
                       alignment: Alignment.center,
                       padding: const EdgeInsets.symmetric(vertical: 20),
                       child: const Text(
-                        'Who else is working with you?',
+                        TeammateNames,
                         style: TextStyle(
                           letterSpacing: 0.5,
                           color: AppColors.blackColor,
@@ -53,13 +63,13 @@ class InvitePage extends ViewModelWidget<CreateOrganizationViewModel> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           SvgPicture.asset(
-                            'assets/icons/svg_icons/link.svg',
+                            LinkLogo,
                             width: 18,
                             // color: AppColors.zuriPrimaryColor,
                           ),
                           const SizedBox(width: 10),
                           const Text(
-                            'Copy and share your invite link',
+                            ShareInviteLink,
                             style: TextStyle(
                               letterSpacing: 0.5,
                               color: AppColors.zuriPrimaryColor,
@@ -73,14 +83,14 @@ class InvitePage extends ViewModelWidget<CreateOrganizationViewModel> {
                       ),
                     ),
                     BorderTextField(
-                      controller: model.inviteController,
-                      hint: 'name@example.com',
+                      hint: SampleEmail,
+                      onChanged: (val) => viewModel.updateData(invi: val),
                     ),
                     const InviteButton(),
                     UIHelper.verticalSpaceMedium,
                     LongButton(
-                        onPressed: () => model.addTeammates(),
-                        label: 'Add Teammates'),
+                        onPressed: () => viewModel.addTeammates(),
+                        label: AddTeammates),
                     const Spacer(flex: 3),
                   ],
                 ),
@@ -97,7 +107,7 @@ class InviteButton extends ViewModelWidget<CreateOrganizationViewModel> {
   const InviteButton({Key? key}) : super(key: key, reactive: true);
 
   @override
-  Widget build(BuildContext context, CreateOrganizationViewModel model) {
+  Widget build(BuildContext context, CreateOrganizationViewModel viewModel) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 15.0),
       child: TextButton(
@@ -118,7 +128,7 @@ class InviteButton extends ViewModelWidget<CreateOrganizationViewModel> {
                 48,
               ),
             )),
-        onPressed: model.onInviteTap,
+        onPressed: viewModel.onInviteTap,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(0, 8, 0, 8),
           child: SizedBox(

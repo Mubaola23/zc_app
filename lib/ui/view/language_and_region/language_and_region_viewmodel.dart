@@ -1,3 +1,6 @@
+// ignore_for_file: avoid_print
+
+import 'package:hng/constants/app_strings.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -8,21 +11,19 @@ import '../../../utilities/enums.dart';
 class LanguageAndRegionModelViewModel extends BaseViewModel {
   final log = getLogger('LanguageAndRegionModelViewModel');
   final _dialogService = locator<DialogService>();
-  String? currentLanguage = 'English (UK)';
+  String? currentLanguage = 'Espanol (Espana)';
   String? currentTimeZone = '(UTC+01:00) West Central Africa';
   bool automaticTimeZone = true;
   int currentValue = 1;
 
   List languages = [
-    'Deutsch (Deutschland)',
-    'English (UK)',
-    'English (US)',
-    'Espanol (Espana)',
-    'Francais (France)',
-    'Italiano (Italy)',
-    'Portugues (Brazil)',
-    '陈摩托何',
-    '来 本 嗄',
+    EnglishUS,
+    Deutsch,
+    Espanol,
+    Francais,
+    Italiano,
+    Portugues,
+    Chinese,
   ];
 
   Future changeLanguage() async {

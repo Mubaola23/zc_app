@@ -1,22 +1,28 @@
 import 'package:hng/app/app.locator.dart';
+import 'package:hng/app/app.router.dart';
+import 'package:hng/models/channels_search_model.dart';
+import 'package:hng/models/user_search_model.dart';
 import 'package:hng/package/base/jump_to_request/jump_to_api.dart';
 import 'package:hng/package/base/server-request/api/zuri_api.dart';
 import 'package:hng/package/base/server-request/channels/channels_api_service.dart';
 import 'package:hng/package/base/server-request/dms/dms_api_service.dart';
+import 'package:hng/package/base/server-request/organization_request/organization_api_service.dart';
 import 'package:hng/services/centrifuge_service.dart';
 import 'package:hng/services/connectivity_service.dart';
 import 'package:hng/services/local_storage_services.dart';
+import 'package:hng/services/media_service.dart';
 import 'package:hng/services/user_service.dart';
+import 'package:hng/utilities/enums.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:stacked_themes/stacked_themes.dart';
 
+import 'test_constants.dart';
 import 'test_helpers.mocks.dart';
 
 ///SUPPLY THE MOCKS FOR ANY SERVICE YOU WANT TO AUTO-GENERATE.
-///ONCE YOU SUPPLY BELOW AUTO GENERATE BY RUNNING "flutter pub run build_runner build --delete-conflicting-outputs"
-
+///ONCE YOU SUPPLY BELOW AUTO GENERATE BY RUNNING ""
 @GenerateMocks([], customMocks: [
   MockSpec<UserService>(returnNullOnMissingStub: true),
   MockSpec<SharedPreferenceLocalStorage>(returnNullOnMissingStub: true),
@@ -31,6 +37,8 @@ import 'test_helpers.mocks.dart';
   MockSpec<ZuriApi>(returnNullOnMissingStub: true),
   MockSpec<ConnectivityService>(returnNullOnMissingStub: true),
   MockSpec<JumpToApi>(returnNullOnMissingStub: true),
+  MockSpec<MediaService>(returnNullOnMissingStub: true),
+  MockSpec<OrganizationApiService>(returnNullOnMissingStub: true),
 ])
 MockUserService getAndRegisterUserServiceMock({
   bool hasUser = false,
@@ -54,16 +62,24 @@ MockSharedPreferenceLocalStorage
 MockNavigationService getAndRegisterNavigationServiceMock() {
   _removeRegistrationIfExists<NavigationService>();
   final service = MockNavigationService();
+  when(service.back()).thenAnswer((realInvocation) => true);
   locator.registerSingleton<NavigationService>(service);
-
+  service.navigateTo(Routes.signUpView);
+  service.navigateTo(Routes.forgotPasswordEmailView);
+  service.navigateTo(Routes.forgotPasswordOtpView);
+  service.navigateTo(Routes.forgotPasswordNewView);
+  service.navigateTo(Routes.loginView);
   return service;
 }
 
-MockSnackbarService getAndRegisterSnackbarServiceMock() {
+MockSnackbarService getAndRegisterSnackbarServiceMock(
+    {bool userRegistered = false}) {
   _removeRegistrationIfExists<SnackbarService>();
   final service = MockSnackbarService();
+  when(service.showCustomSnackBar(
+    variant: SnackbarType.failure,
+  )).thenAnswer((_) => Future.value(userRegistered));
   locator.registerSingleton<SnackbarService>(service);
-
   return service;
 }
 
@@ -75,9 +91,15 @@ MockThemeService getAndRegisterThemeServiceMock() {
   return service;
 }
 
-MockDialogService getAndRegisterDialogServiceMock() {
+MockDialogService getAndRegisterDialogServiceMock(
+    {DialogResponse<dynamic>? dialogResult /*,String? currentEmoji*/}) {
   _removeRegistrationIfExists<DialogService>();
   final service = MockDialogService();
+  Future<DialogResponse<dynamic>?> response =
+      Future.value(DialogResponse(confirmed: true));
+  when(service.showCustomDialog(
+    variant: DialogType.skinTone,
+  )).thenAnswer((realInvocation) => response);
   locator.registerSingleton<DialogService>(service);
 
   return service;
@@ -86,6 +108,12 @@ MockDialogService getAndRegisterDialogServiceMock() {
 MockBottomSheetService getAndRegisterBottomSheetServiceMock() {
   _removeRegistrationIfExists<BottomSheetService>();
   final service = MockBottomSheetService();
+  Future<SheetResponse<dynamic>?> response =
+      Future.value(SheetResponse(confirmed: true));
+  when(service.showCustomSheet(
+    variant: BottomSheetType.user,
+    isScrollControlled: true,
+  )).thenAnswer((realInvocation) => response);
   locator.registerSingleton<BottomSheetService>(service);
 
   return service;
@@ -108,11 +136,11 @@ MockChannelsApiService getAndRegisterChannelsApiServiceMock() {
 }
 
 MockCentrifugeService getAndRegisterCentrifugeServiceMock() {
+  final service = MockCentrifugeService();
   _removeRegistrationIfExists<CentrifugeService>();
   Map eventData = {"some_key": "some_returned_string"};
   final Future<Stream?> streamtoReturn =
       Future.value(Stream.fromIterable([eventData]));
-  final service = MockCentrifugeService();
   when(service.subscribe("channelSocketID"))
       .thenAnswer((_) async => streamtoReturn);
 
@@ -129,12 +157,17 @@ MockZuriApi getAndRegisterZuriApiMock() {
   final service = MockZuriApi();
   locator.registerSingleton<ZuriApi>(service);
 
+  when(service.uploadImage(fileMock,
+          token: token_string, memberId: memberId_string, orgId: orgId_string))
+      .thenAnswer((_) async => Future.value("Image Address"));
   return service;
 }
 
 MockConnectivityService getAndRegisterConnectivityServiceMock() {
   _removeRegistrationIfExists<ConnectivityService>();
   final service = MockConnectivityService();
+  var result = Future.value(const bool.fromEnvironment('network status'));
+  when(service.checkConnection()).thenAnswer((realInvocation) => result);
   locator.registerSingleton<ConnectivityService>(service);
 
   return service;
@@ -144,7 +177,21 @@ MockJumpToApi getAndRegisterJumpToApiMock() {
   _removeRegistrationIfExists<JumpToApi>();
   final service = MockJumpToApi();
   locator.registerSingleton<JumpToApi>(service);
+  when(service.allChannelsList())
+      .thenAnswer((realInvocation) => Future.value([ChannelsSearch()]));
+  when(service.fetchList())
+      .thenAnswer((realInvocation) => Future.value([NewUser()]));
+  return service;
+}
 
+MockMediaService getAndRegisterMediaServiceMock() {
+  _removeRegistrationIfExists<MediaService>();
+  final service = MockMediaService();
+  Future<String> response = Future<String>.value("Image Address");
+
+  when(service.uploadImage(fileMock)).thenAnswer((_) async => response);
+
+  locator.registerSingleton<MediaService>(service);
   return service;
 }
 
@@ -162,6 +209,7 @@ void registerServices() {
   getAndRegisterZuriApiMock();
   getAndRegisterConnectivityServiceMock();
   getAndRegisterJumpToApiMock();
+  getAndRegisterMediaServiceMock();
 }
 
 void unregisterServices() {
@@ -179,6 +227,7 @@ void unregisterServices() {
   _removeRegistrationIfExists<ZuriApi>();
   _removeRegistrationIfExists<ConnectivityService>();
   _removeRegistrationIfExists<JumpToApi>();
+  _removeRegistrationIfExists<MediaService>();
 }
 
 // Call this before any service registration helper. This is to ensure that if there

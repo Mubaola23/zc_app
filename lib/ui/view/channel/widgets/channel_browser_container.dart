@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:hng/constants/app_strings.dart';
 import 'package:hng/ui/view/channel/channel_list/channels_viewmodel.dart';
 import 'package:stacked/stacked.dart';
 
 class ChannelBrowserContainer extends ViewModelWidget<ChannelListViewModel> {
   final String channelName;
   final String? channelId;
-  ChannelBrowserContainer({required this.channelName, this.channelId});
+  const ChannelBrowserContainer(
+      {required this.channelName, this.channelId, Key? key})
+      : super(key: key);
 
   @override
-  Widget build(BuildContext context, ChannelListViewModel model) {
+  Widget build(BuildContext context, ChannelListViewModel viewModel) {
     return InkWell(
-      onTap: () {
-        print(channelId);
-        // model.navigateToChannelPage(
-        //     channelname, channelId, membersCount, public);
-      },
+      onTap: () {},
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -24,7 +23,7 @@ class ChannelBrowserContainer extends ViewModelWidget<ChannelListViewModel> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              const Text('#',
+              const Text(hash,
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               Padding(
                 padding: const EdgeInsets.only(left: 18.0),
@@ -40,18 +39,17 @@ class ChannelBrowserContainer extends ViewModelWidget<ChannelListViewModel> {
                     ),
                     const SizedBox(height: 7),
                     Row(
-                      children: <Widget>[
-                        const Text('You are a member',
+                      children: const [
+                        Text(YouAreAMember,
                             style: TextStyle(
                                 color: Color(0xff00B87C), fontSize: 14)),
-                        const SizedBox(width: 5),
-                        const Icon(Icons.circle,
-                            color: Color(0XFFFBEBEBE), size: 10),
-                        const SizedBox(width: 5),
-                        const Text(
-                          '128 members',
-                          style: TextStyle(
-                              color: Color(0XFFFBEBEBE), fontSize: 15),
+                        SizedBox(width: 5),
+                        Icon(Icons.circle, color: Color(0xffbebebe), size: 10),
+                        SizedBox(width: 5),
+                        Text(
+                          MembersCount,
+                          style:
+                              TextStyle(color: Color(0xffbebebe), fontSize: 15),
                         )
                       ],
                     )

@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:hng/services/local_storage_services.dart';
+import 'package:hng/utilities/storage_keys.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -5,19 +9,55 @@ import '../../../../app/app.locator.dart';
 import '../../../../app/app.router.dart';
 import '../../../../models/user_post.dart';
 import '../../../../utilities/enums.dart';
+import 'package:hng/app/app.logger.dart';
 
 class ThreadCardViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
   final _bottomSheetService = locator<BottomSheetService>();
+  final storage = locator<SharedPreferenceLocalStorage>();
+    final log = getLogger("ThreadCardViewModel");
 
-  // ignore: todo
   //TODO Delete this random number stuff
   //this was created to give the emojis unique ids which  would be handled by the backend
   int randomVarBank = 1000;
 
+  goBack() => _navigationService.back();
+
+  saveItem(
+      {String? channelID,
+      String? channelName,
+      String? messageID,
+      String? message,
+      String? lastSeen,
+      String? userID,
+      String? userImage,
+      String? displayName}) async {
+    var savedMessageMap = {
+      'channel_id': channelID,
+      'channel_name': channelName,
+      'message_id': messageID,
+      'message': message,
+      'last_seen': lastSeen,
+      'user_id': userID,
+      'user_image': userImage,
+      'display_name': displayName
+    };
+    if (message!.isNotEmpty) {
+      var currentList = storage.getStringList(StorageKeys.savedItem) ?? [];
+      currentList.add(messageID!);
+      await storage.setStringList(StorageKeys.savedItem, currentList);
+      await storage.setString(messageID, json.encode(savedMessageMap));
+      log.i(savedMessageMap);
+      final len = storage.getStringList(StorageKeys.savedItem);
+      log.w(len!.length.toString());
+    }
+  }
+
   Future navigateToThread(UserPost? userPost) async {
-    _navigationService.navigateTo(Routes.threadDetailView,
-        arguments: ThreadDetailViewArguments(userPost: userPost));
+    _navigationService.navigateTo(
+      Routes.threadDetailView,
+      arguments: ThreadDetailViewArguments(userPost: userPost),
+    );
   }
 
   Future viewProfile() async {
@@ -28,7 +68,7 @@ class ThreadCardViewModel extends BaseViewModel {
   }
 
   Future addEmojis(UserPost? userPost) async {
-    var emoji;
+    String? emoji;
     var sheetResponse = await _bottomSheetService.showCustomSheet(
       variant: BottomSheetType.emojiPicker,
       isScrollControlled: true,
@@ -36,11 +76,10 @@ class ThreadCardViewModel extends BaseViewModel {
 
     if (sheetResponse!.confirmed == true) {
       emoji = sheetResponse.data.emoji;
-      print(emoji);
 
       userPost!.addReaction(
           PostEmojis(id: randomVarBank, postEmoji: emoji, postEmojiCount: 1));
-      // ignore: todo
+
       //TODO remove this
       randomVarBank += 1;
       notifyListeners();
@@ -48,14 +87,13 @@ class ThreadCardViewModel extends BaseViewModel {
   }
 
   void checkReact(UserPost? userPost, int? emojiId) {
-    var testvar = userPost!.postEmojis!.where((e) {
+    userPost!.postEmojis!.where((e) {
       if (e.id == emojiId) {
         e.hasReacted ? unReact(userPost, e) : react(e);
       }
 
       return false;
     });
-    print(testvar);
   }
 
   void react(PostEmojis emoji) {

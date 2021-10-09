@@ -1,41 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:hng/constants/app_strings.dart';
+import 'package:hng/ui/shared/zuri_appbar.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked_services/stacked_services.dart';
 
-import '../../../app/app.locator.dart';
 import '../../shared/shared.dart';
 import 'add_people_viewmodel.dart';
 import 'widgets/custom_people_list_tile.dart';
 
 class AddPeopleView extends StatelessWidget {
-  final navigator = locator<NavigationService>();
+  const AddPeopleView({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<AddPeopleViewModel>.reactive(
       builder: (context, model, child) => Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          leading: IconButton(
-            onPressed: () {
-              navigator.back();
-            },
-            icon: const Icon(Icons.close, color: Colors.black),
+        appBar: ZuriAppBar(
+          leading: Icons.arrow_back_ios,
+          leadingPress: () => model.goBack(),
+          orgTitle: Text(
+            AddPeople,
+            style: AppTextStyles.heading7,
           ),
-          title: const Text('Add People',
-              style: TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF333333),
-                fontSize: 16,
-              )),
+          whiteBackground: true,
           actions: [
             TextButton(
               onPressed: () {},
-              child: const Text('Add',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w300,
-                    color: Color(0xFF00B87C),
-                    fontSize: 14,
-                  )),
+              child: const Text(
+                Add,
+                style: TextStyle(
+                  fontWeight: FontWeight.w300,
+                  color: Color(0xFF00B87C),
+                  fontSize: 14,
+                ),
+              ),
             ),
           ],
         ),
@@ -53,7 +50,7 @@ class AddPeopleView extends StatelessWidget {
                   child: TextField(
                     decoration: InputDecoration(
                       contentPadding: EdgeInsets.all(15),
-                      hintText: 'Search people to add',
+                      hintText: SearchPeople,
                       hintStyle: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w400,
@@ -75,13 +72,13 @@ class AddPeopleView extends StatelessWidget {
               const SizedBox(height: 16),
               const Divider(),
               ListTile(
-                title: const Text('Add Everyone',
+                title: const Text(AddEveryone,
                     style: TextStyle(
                       fontWeight: FontWeight.w700,
                       color: Color(0xFF333333),
                       fontSize: 16,
                     )),
-                subtitle: const Text('Everyone will be added to channel'),
+                subtitle: const Text(EveryoneWillBeAdded),
                 trailing: Checkbox(
                     checkColor: Colors.white,
                     value: true,
@@ -89,26 +86,26 @@ class AddPeopleView extends StatelessWidget {
               ),
               const Divider(),
               const CustomPeopleListTile(
-                imagelink: 'assets/channel_page/femaleuser.png',
-                userName: 'Caleb',
+                imagelink: FemaleUser,
+                userName: PaulEke,
                 isOnline: true,
               ),
               const SizedBox(height: 16),
               const CustomPeopleListTile(
-                imagelink: 'assets/channel_page/female.png',
-                userName: 'Lisa',
+                imagelink: Female,
+                userName: Quwaysim,
                 isOnline: false,
               ),
               const SizedBox(height: 16),
               const CustomPeopleListTile(
-                imagelink: 'assets/channel_page/femaleuser.png',
-                userName: 'Jennie',
+                imagelink: FemaleUser,
+                userName: BlazeBrain,
                 isOnline: false,
               ),
               const SizedBox(height: 16),
               const CustomPeopleListTile(
-                imagelink: 'assets/channel_page/female.png',
-                userName: 'Zigga',
+                imagelink: Female,
+                userName: FreshFish,
                 isOnline: true,
               ),
               const SizedBox(height: 20),

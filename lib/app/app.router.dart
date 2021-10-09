@@ -6,12 +6,12 @@
 
 // ignore_for_file: public_member_api_docs
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 import '../models/channel_members.dart';
 import '../models/channel_model.dart';
+import '../models/user_model.dart';
 import '../models/user_post.dart';
 import '../ui/nav_pages/home_page/home_page.dart';
 import '../ui/view/add_people/add_people_view.dart';
@@ -24,6 +24,7 @@ import '../ui/view/channel/channel_view/channel_page_view.dart';
 import '../ui/view/channel/edit_channel/edit_channel_view.dart';
 import '../ui/view/channel/new_channel/new_channel.dart';
 import '../ui/view/clear_after/clear_after_view.dart';
+import '../ui/view/direct_message/direct_message.dart';
 import '../ui/view/dm_chat_view/dm_jump_to_view.dart';
 import '../ui/view/dm_search/dm_search_view.dart';
 import '../ui/view/dm_user/dm_user_view.dart';
@@ -58,10 +59,10 @@ import '../ui/view/set_status/set_status_view.dart';
 import '../ui/view/sign_up/sign_up_view.dart';
 import '../ui/view/splashscreen/splashscreen.dart';
 import '../ui/view/start_dm/start_dm_view.dart';
+import '../ui/view/static_pages/terms_and_conditions/terms_and_conditions_view.dart';
 import '../ui/view/threads/all_threads/threads_view.dart';
 import '../ui/view/threads/thread_detail/thread_detail_view.dart';
 import '../ui/view/user_search/user_search_view.dart';
-import '../ui/view/view_profile_page/view_profile.dart';
 import '../utilities/enums.dart';
 
 class Routes {
@@ -88,7 +89,6 @@ class Routes {
   static const String addPluginView = '/add-plugin-view';
   static const String useDifferentEmailView = '/use-different-email-view';
   static const String editPluginView = '/edit-plugin-view';
-  static const String viewProfile = '/view-profile';
   static const String setStatusView = '/set-status-view';
   static const String profilePageView = '/profile-page-view';
   static const String preferenceView = '/preference-view';
@@ -115,6 +115,8 @@ class Routes {
   static const String organizationUrlView = '/organization-url-view';
   static const String channelPageView = '/channel-page-view';
   static const String channelInfoView = '/channel-info-view';
+  static const String directMessage = '/direct-message';
+  static const String termsAndConditionsView = '/terms-and-conditions-view';
   static const all = <String>{
     channelAddPeopleView,
     navBarView,
@@ -139,7 +141,6 @@ class Routes {
     addPluginView,
     useDifferentEmailView,
     editPluginView,
-    viewProfile,
     setStatusView,
     profilePageView,
     preferenceView,
@@ -165,6 +166,8 @@ class Routes {
     organizationUrlView,
     channelPageView,
     channelInfoView,
+    directMessage,
+    termsAndConditionsView,
   };
 }
 
@@ -195,7 +198,6 @@ class StackedRouter extends RouterBase {
     RouteDef(Routes.addPluginView, page: AddPluginView),
     RouteDef(Routes.useDifferentEmailView, page: UseDifferentEmailView),
     RouteDef(Routes.editPluginView, page: EditPluginView),
-    RouteDef(Routes.viewProfile, page: ViewProfile),
     RouteDef(Routes.setStatusView, page: SetStatusView),
     RouteDef(Routes.profilePageView, page: ProfilePageView),
     RouteDef(Routes.preferenceView, page: PreferenceView),
@@ -222,13 +224,20 @@ class StackedRouter extends RouterBase {
     RouteDef(Routes.organizationUrlView, page: OrganizationUrlView),
     RouteDef(Routes.channelPageView, page: ChannelPageView),
     RouteDef(Routes.channelInfoView, page: ChannelInfoView),
+    RouteDef(Routes.directMessage, page: DirectMessage),
+    RouteDef(Routes.termsAndConditionsView, page: TermsAndConditionsView),
   ];
   @override
   Map<Type, StackedRouteFactory> get pagesMap => _pagesMap;
   final _pagesMap = <Type, StackedRouteFactory>{
     ChannelAddPeopleView: (data) {
+      var args = data.getArgs<ChannelAddPeopleViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => const ChannelAddPeopleView(),
+        builder: (context) => ChannelAddPeopleView(
+          key: args.key,
+          channelId: args.channelId,
+          channelName: args.channelName,
+        ),
         settings: data,
       );
     },
@@ -245,20 +254,29 @@ class StackedRouter extends RouterBase {
       );
     },
     LoginView: (data) {
+      var args = data.getArgs<LoginViewArguments>(
+        orElse: () => LoginViewArguments(),
+      );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => LoginView(),
+        builder: (context) => LoginView(key: args.key),
         settings: data,
       );
     },
     OTPView: (data) {
+      var args = data.getArgs<OTPViewArguments>(
+        orElse: () => OTPViewArguments(),
+      );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => OTPView(),
+        builder: (context) => OTPView(key: args.key),
         settings: data,
       );
     },
     SignUpView: (data) {
+      var args = data.getArgs<SignUpViewArguments>(
+        orElse: () => SignUpViewArguments(),
+      );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => SignUpView(),
+        builder: (context) => SignUpView(key: args.key),
         settings: data,
       );
     },
@@ -303,31 +321,43 @@ class StackedRouter extends RouterBase {
     },
     ChannelNotificationView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => ChannelNotificationView(),
+        builder: (context) => const ChannelNotificationView(),
         settings: data,
       );
     },
     NewChannel: (data) {
+      var args = data.getArgs<NewChannelArguments>(
+        orElse: () => NewChannelArguments(),
+      );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => NewChannel(),
+        builder: (context) => NewChannel(key: args.key),
         settings: data,
       );
     },
     HomePage: (data) {
+      var args = data.getArgs<HomePageArguments>(
+        orElse: () => HomePageArguments(),
+      );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => const HomePage(),
+        builder: (context) => HomePage(
+          key: args.key,
+          organizationLogo: args.organizationLogo,
+        ),
         settings: data,
       );
     },
     AddPeopleView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => AddPeopleView(),
+        builder: (context) => const AddPeopleView(),
         settings: data,
       );
     },
     DmSearch: (data) {
+      var args = data.getArgs<DmSearchArguments>(
+        orElse: () => DmSearchArguments(),
+      );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => const DmSearch(),
+        builder: (context) => DmSearch(key: args.key),
         settings: data,
       );
     },
@@ -371,8 +401,12 @@ class StackedRouter extends RouterBase {
       );
     },
     UseDifferentEmailView: (data) {
+      var args = data.getArgs<UseDifferentEmailViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => const UseDifferentEmailView(),
+        builder: (context) => UseDifferentEmailView(
+          key: args.key,
+          method: args.method,
+        ),
         settings: data,
       );
     },
@@ -382,15 +416,9 @@ class StackedRouter extends RouterBase {
         settings: data,
       );
     },
-    ViewProfile: (data) {
-      return MaterialPageRoute<dynamic>(
-        builder: (context) => ViewProfile(),
-        settings: data,
-      );
-    },
     SetStatusView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => SetStatusView(),
+        builder: (context) => const SetStatusView(),
         settings: data,
       );
     },
@@ -443,8 +471,12 @@ class StackedRouter extends RouterBase {
       );
     },
     EditProfileView: (data) {
+      var args = data.getArgs<EditProfileViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => const EditProfileView(),
+        builder: (context) => EditProfileView(
+          key: args.key,
+          user: args.user,
+        ),
         settings: data,
       );
     },
@@ -472,7 +504,7 @@ class StackedRouter extends RouterBase {
     },
     AddOrganizationView: (data) {
       return MaterialPageRoute<dynamic>(
-        builder: (context) => AddOrganizationView(),
+        builder: (context) => const AddOrganizationView(),
         settings: data,
       );
     },
@@ -525,7 +557,11 @@ class StackedRouter extends RouterBase {
         orElse: () => EditChannelPageViewArguments(),
       );
       return MaterialPageRoute<dynamic>(
-        builder: (context) => EditChannelPageView(key: args.key),
+        builder: (context) => EditChannelPageView(
+          key: args.key,
+          channelName: args.channelName,
+          channelId: args.channelId,
+        ),
         settings: data,
       );
     },
@@ -539,8 +575,12 @@ class StackedRouter extends RouterBase {
       );
     },
     OrganizationUrlView: (data) {
+      var args = data.getArgs<OrganizationUrlViewArguments>(nullOk: false);
       return MaterialPageRoute<dynamic>(
-        builder: (context) => const OrganizationUrlView(),
+        builder: (context) => OrganizationUrlView(
+          key: args.key,
+          email: args.email,
+        ),
         settings: data,
       );
     },
@@ -549,7 +589,7 @@ class StackedRouter extends RouterBase {
       return MaterialPageRoute<dynamic>(
         builder: (context) => ChannelPageView(
           key: args.key,
-          channelname: args.channelname,
+          channelName: args.channelName,
           channelId: args.channelId,
           membersCount: args.membersCount,
           public: args.public,
@@ -569,12 +609,57 @@ class StackedRouter extends RouterBase {
         settings: data,
       );
     },
+    DirectMessage: (data) {
+      var args = data.getArgs<DirectMessageArguments>(
+        orElse: () => DirectMessageArguments(),
+      );
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => DirectMessage(
+          key: args.key,
+          username: args.username,
+        ),
+        settings: data,
+      );
+    },
+    TermsAndConditionsView: (data) {
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => const TermsAndConditionsView(),
+        settings: data,
+      );
+    },
   };
 }
 
 /// ************************************************************************
 /// Arguments holder classes
 /// *************************************************************************
+
+/// ChannelAddPeopleView arguments holder class
+class ChannelAddPeopleViewArguments {
+  final Key? key;
+  final String channelId;
+  final String channelName;
+  ChannelAddPeopleViewArguments(
+      {this.key, required this.channelId, required this.channelName});
+}
+
+/// LoginView arguments holder class
+class LoginViewArguments {
+  final Key? key;
+  LoginViewArguments({this.key});
+}
+
+/// OTPView arguments holder class
+class OTPViewArguments {
+  final Key? key;
+  OTPViewArguments({this.key});
+}
+
+/// SignUpView arguments holder class
+class SignUpViewArguments {
+  final Key? key;
+  SignUpViewArguments({this.key});
+}
 
 /// ForgotPasswordEmailView arguments holder class
 class ForgotPasswordEmailViewArguments {
@@ -594,6 +679,25 @@ class ForgotPasswordNewViewArguments {
   ForgotPasswordNewViewArguments({this.key});
 }
 
+/// NewChannel arguments holder class
+class NewChannelArguments {
+  final Key? key;
+  NewChannelArguments({this.key});
+}
+
+/// HomePage arguments holder class
+class HomePageArguments {
+  final Key? key;
+  final Widget? organizationLogo;
+  HomePageArguments({this.key, this.organizationLogo});
+}
+
+/// DmSearch arguments holder class
+class DmSearchArguments {
+  final Key? key;
+  DmSearchArguments({this.key});
+}
+
 /// DmJumpToView arguments holder class
 class DmJumpToViewArguments {
   final Key? key;
@@ -610,6 +714,20 @@ class DmUserViewArguments {
 class AddPluginViewArguments {
   final Key? key;
   AddPluginViewArguments({this.key});
+}
+
+/// UseDifferentEmailView arguments holder class
+class UseDifferentEmailViewArguments {
+  final Key? key;
+  final OrganizationSwitchMethod method;
+  UseDifferentEmailViewArguments({this.key, required this.method});
+}
+
+/// EditProfileView arguments holder class
+class EditProfileViewArguments {
+  final Key? key;
+  final UserModel user;
+  EditProfileViewArguments({this.key, required this.user});
 }
 
 /// SelectEmail arguments holder class
@@ -636,7 +754,9 @@ class ThreadDetailViewArguments {
 /// EditChannelPageView arguments holder class
 class EditChannelPageViewArguments {
   final Key? key;
-  EditChannelPageViewArguments({this.key});
+  final String? channelName;
+  final String? channelId;
+  EditChannelPageViewArguments({this.key, this.channelName, this.channelId});
 }
 
 /// StartDmView arguments holder class
@@ -645,16 +765,23 @@ class StartDmViewArguments {
   StartDmViewArguments({this.key});
 }
 
+/// OrganizationUrlView arguments holder class
+class OrganizationUrlViewArguments {
+  final Key? key;
+  final String email;
+  OrganizationUrlViewArguments({this.key, required this.email});
+}
+
 /// ChannelPageView arguments holder class
 class ChannelPageViewArguments {
   final Key? key;
-  final String? channelname;
+  final String? channelName;
   final String? channelId;
   final int? membersCount;
   final bool? public;
   ChannelPageViewArguments(
       {this.key,
-      required this.channelname,
+      required this.channelName,
       required this.channelId,
       required this.membersCount,
       required this.public});
@@ -671,4 +798,11 @@ class ChannelInfoViewArguments {
       required this.numberOfMembers,
       required this.channelMembers,
       required this.channelDetail});
+}
+
+/// DirectMessage arguments holder class
+class DirectMessageArguments {
+  final Key? key;
+  final String? username;
+  DirectMessageArguments({this.key, this.username});
 }

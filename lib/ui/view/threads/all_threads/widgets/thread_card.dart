@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hng/constants/app_strings.dart';
 import 'package:stacked/stacked.dart';
-
+//The screen shown in homepage -> Threads
 import '../../../../../general_widgets/channel_icon.dart';
 import '../../../../../general_widgets/custom_text.dart';
 import '../../../../../models/user_post.dart';
@@ -17,7 +18,7 @@ class ThreadCard extends ViewModelWidget<ThreadsViewModel> {
   final UserPost? userPost;
 
   @override
-  Widget build(BuildContext context, ThreadsViewModel model) {
+  Widget build(BuildContext context, ThreadsViewModel viewModel) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       color: AppColors.whiteColor,
@@ -40,7 +41,7 @@ class ThreadCard extends ViewModelWidget<ThreadsViewModel> {
               ],
             ),
             subtitle: Text(
-              'You, Jane and 2 others',
+              YouAndOthers,
               style: AppTextStyles.subtitle,
             ),
           ),
@@ -52,17 +53,18 @@ class ThreadCard extends ViewModelWidget<ThreadsViewModel> {
                   itemCount: userPost!.userThreadPosts!.length,
                   itemBuilder: (ctx, index) {
                     return GestureDetector(
-                        onTap: () => model.navigateToThread(userPost),
-                        child: ThreadCardView.threadPost(
-                            userPost!.userThreadPosts![index]));
+                      onTap: () => viewModel.navigateToThread(userPost),
+                      child: ThreadCardView.threadPost(
+                        userPost!.userThreadPosts![index],
+                      ),
+                    );
                   })
               : Container(),
           Padding(
             padding: const EdgeInsets.only(left: 60),
             child: MaterialButton(
-              // ignore: todo
               //TODO navigate to details page and focus input
-              onPressed: () => model.navigateToThread(userPost),
+              onPressed: () => viewModel.navigateToThread(userPost),
               shape: const RoundedRectangleBorder(
                 side: BorderSide(width: 1),
                 borderRadius: BorderRadius.all(
@@ -70,7 +72,7 @@ class ThreadCard extends ViewModelWidget<ThreadsViewModel> {
                 ),
               ),
               child: const CustomText(
-                text: 'Reply',
+                text: Reply,
                 fontWeight: FontWeight.w500,
               ),
             ),

@@ -14,15 +14,14 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 class ForgotPasswordOtpViewModel extends FormViewModel {
-  NavigationService _navigationService = NavigationService();
-  final _apiService = ZuriApi(baseUrl: coreBaseUrl);
+  final NavigationService _navigationService = NavigationService();
+  final _apiService = ZuriApi(coreBaseUrl);
   final _snackbarService = locator<SnackbarService>();
   bool isLoading = false;
   final storageService = locator<SharedPreferenceLocalStorage>();
   String? get token =>
       storageService.getString(StorageKeys.currentSessionToken);
 
-  // ignore: close_sinks
   StreamController<ErrorAnimationType>? errorController;
 
   loading(status) {
@@ -42,14 +41,13 @@ class ForgotPasswordOtpViewModel extends FormViewModel {
       _snackbarService.showCustomSnackBar(
           duration: const Duration(seconds: 3),
           variant: SnackbarType.failure,
-          message: FillAllFields);
+          message: fillAllFields);
       return;
     }
     notifyListeners();
 
     final validationData = {'code': otpValue};
-
-    final response = await _apiService.post(VerifyOTPEndpoint,
+    final response = await _apiService.post(verifyOTPEndpoint,
         body: validationData, token: token);
     loading(false);
     if (response?.statusCode == 200) {
@@ -63,7 +61,7 @@ class ForgotPasswordOtpViewModel extends FormViewModel {
       _snackbarService.showCustomSnackBar(
         duration: const Duration(seconds: 2),
         variant: SnackbarType.failure,
-        message: response?.data['message'] ?? ErrorOTP,
+        message: response?.data['message'] ?? errorOTP,
       );
     }
   }

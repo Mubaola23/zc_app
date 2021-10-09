@@ -1,4 +1,8 @@
 //On login or signup the user service is used to save all the user details
+import 'dart:convert';
+
+import 'package:hng/models/user_model.dart';
+
 import '../app/app.locator.dart';
 import '../models/organization_model.dart';
 import 'local_storage_services.dart';
@@ -8,9 +12,8 @@ import '../utilities/storage_keys.dart';
 ///And returning the data that is saved, you can choose to use it or
 ///get the data to local storage yourself
 class UserService {
-  bool? get hasUser => hasUser;
+  bool? get hasUser => null;
   final _sharedPrefs = locator<SharedPreferenceLocalStorage>();
-
 
   //All this are the current user details to be used
   String _currentOrgId = '';
@@ -19,7 +22,6 @@ class UserService {
   String _authToken = '';
   String _userId = '';
   String _userEmail = '';
-
 
   ///This will give you null because organization data has not been added
   OrganizationModel? organizationModel;
@@ -44,8 +46,13 @@ class UserService {
     return _currentOrgUrl;
   }
 
+  void setUserDetails(UserModel user) {
+    final val = jsonEncode(user.toMap());
+    _sharedPrefs.setString(StorageKeys.currentUserModel, val);
+  }
+
   void setOrganization() {
-    // Todo implement Organization setter
+    // TODO implement Organization setter
   }
 
   ///From the organization side bar set the current organissation Id
@@ -68,10 +75,24 @@ class UserService {
     return _userId;
   }
 
+    String get memberId {
+    _userId = _sharedPrefs.getString(StorageKeys.idInOrganization) ?? '';
+    //You can perform other function before returning
+    return _userId;
+  }
+
   String get userEmail {
     _userEmail = _sharedPrefs.getString(StorageKeys.currentUserEmail) ?? '';
     //You can perform other function before returning
     return _userEmail;
+  }
+
+  UserModel? get userDetails {
+    final res = _sharedPrefs.getString(StorageKeys.currentUserModel);
+    if (res == null) {
+      return null;
+    }
+    return UserModel.fromMap(jsonDecode(res));
   }
 
   void setUserAndToken({
@@ -79,7 +100,7 @@ class UserService {
     required String? userId,
     required String? userEmail,
   }) {
-    //Todo: throw error for null parameters
+    //TODO: throw error for null parameters
     _authToken = authToken ?? '';
     _userId = userId ?? '';
     _userEmail = userEmail ?? '';
