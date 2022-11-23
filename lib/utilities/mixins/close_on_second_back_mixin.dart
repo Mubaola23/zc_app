@@ -1,6 +1,6 @@
-import '../../general_widgets/app_toast.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
 
-import '../constants.dart';
+import '../../services/app_services/app_toast.dart';
 
 mixin CustomWillPopScopeMixin {
   static bool _secondBack = false;

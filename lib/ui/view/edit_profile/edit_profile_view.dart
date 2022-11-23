@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/models/user_model.dart';
+import 'package:zurichat/models/user_model.dart';
+import 'package:zurichat/ui/shared/shared.dart';
 
-import 'package:hng/ui/shared/shared.dart';
-import 'package:hng/ui/shared/zuri_appbar.dart';
+import 'package:zurichat/utilities/constants/text_styles.dart';
+import 'package:zurichat/ui/shared/dumb_widgets/zuri_appbar.dart';
+import 'package:zurichat/ui/shared/dumb_widgets/zuri_loader.dart';
+import 'package:zurichat/utilities/internationalization/app_localization.dart';
 
 import 'package:stacked/stacked.dart';
 
@@ -16,46 +18,48 @@ class EditProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Size _size = MediaQuery.of(context).size;
+    final local = AppLocalization.of(context);
+    Size size = MediaQuery.of(context).size;
     return ViewModelBuilder<EditProfileViewModel>.reactive(
       viewModelBuilder: () => EditProfileViewModel(),
       onModelReady: (model) => model.onInit(user),
       builder: (context, viewModel, child) => Scaffold(
         appBar: ZuriAppBar(
-          whiteBackground: true,
           leading: Icons.close_rounded,
           leadingPress: () => viewModel.close(),
           orgTitle: Text(
-            "Edit Profile",
-            style: AppTextStyles.heading4,
+            local!.editProfileButton,
+            style: AppTextStyle.darkGreySize18Bold.copyWith(
+              color: Theme.of(context).textTheme.bodyText1!.color,
+            ),
           ),
           actions: [
             TextButton(
-              onPressed: () => viewModel.onSave(),
-              child: Text(
-                Save.toUpperCase(),
-                style: AppTextStyles.body1Bold.copyWith(
-                    color: viewModel.hasDataChanged
-                        ? AppColors.deepBlackColor
-                        : AppColors.zuriGrey),
-              ),
-            ),
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                viewModel.onSave();
+              },
+              child: viewModel.isSaving
+                  ? const SizedBox(
+                      height: 20.0,
+                      width: 20.0,
+                      child: CircularProgressIndicator(
+                        color: AppColors.zuriPrimaryColor,
+                      ),
+                    )
+                  : Text(
+                      local.save,
+                      style: AppTextStyle.greenSize16,
+                    ),
+            )
           ],
+          isDarkMode: Theme.of(context).brightness == Brightness.dark,
+          whiteBackground: true,
         ),
         body: Visibility(
           visible: !viewModel.isBusy,
-          child: Body(size: _size),
-          replacement: Center(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(GettingYourData),
-                CircularProgressIndicator(
-                  color: AppColors.zuriPrimaryColor,
-                ),
-              ],
-            ),
-          ),
+          replacement: const ZuriLoader(),
+          child: EditProfileBody(size: size),
         ),
       ),
     );

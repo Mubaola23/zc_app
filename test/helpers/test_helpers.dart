@@ -1,22 +1,22 @@
-import 'package:hng/app/app.locator.dart';
-import 'package:hng/app/app.router.dart';
-import 'package:hng/models/channels_search_model.dart';
-import 'package:hng/models/user_search_model.dart';
-import 'package:hng/package/base/jump_to_request/jump_to_api.dart';
-import 'package:hng/package/base/server-request/api/zuri_api.dart';
-import 'package:hng/package/base/server-request/channels/channels_api_service.dart';
-import 'package:hng/package/base/server-request/dms/dms_api_service.dart';
-import 'package:hng/package/base/server-request/organization_request/organization_api_service.dart';
-import 'package:hng/services/centrifuge_service.dart';
-import 'package:hng/services/connectivity_service.dart';
-import 'package:hng/services/local_storage_services.dart';
-import 'package:hng/services/media_service.dart';
-import 'package:hng/services/user_service.dart';
-import 'package:hng/utilities/enums.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:stacked_themes/stacked_themes.dart';
+import 'package:zurichat/app/app.locator.dart';
+import 'package:zurichat/app/app.router.dart';
+import 'package:zurichat/models/channels_search_model.dart';
+import 'package:zurichat/models/user_search_model.dart';
+import 'package:zurichat/services/app_services/connectivity_service.dart';
+import 'package:zurichat/services/app_services/local_storage_services.dart';
+import 'package:zurichat/services/app_services/media_service.dart';
+import 'package:zurichat/services/core_services/organization_api_service.dart';
+import 'package:zurichat/services/in_review/jump_to_api.dart';
+import 'package:zurichat/services/in_review/user_service.dart';
+import 'package:zurichat/services/messaging_services/centrifuge_rtc_service.dart';
+import 'package:zurichat/services/messaging_services/channels_api_service.dart';
+import 'package:zurichat/services/messaging_services/dms_api_service.dart';
+import 'package:zurichat/utilities/api_handlers/zuri_api.dart';
+import 'package:zurichat/utilities/enums.dart';
 
 import 'test_constants.dart';
 import 'test_helpers.mocks.dart';
@@ -24,21 +24,21 @@ import 'test_helpers.mocks.dart';
 ///SUPPLY THE MOCKS FOR ANY SERVICE YOU WANT TO AUTO-GENERATE.
 ///ONCE YOU SUPPLY BELOW AUTO GENERATE BY RUNNING ""
 @GenerateMocks([], customMocks: [
-  MockSpec<UserService>(returnNullOnMissingStub: true),
-  MockSpec<SharedPreferenceLocalStorage>(returnNullOnMissingStub: true),
-  MockSpec<NavigationService>(returnNullOnMissingStub: true),
-  MockSpec<SnackbarService>(returnNullOnMissingStub: true),
-  MockSpec<ThemeService>(returnNullOnMissingStub: true),
-  MockSpec<DialogService>(returnNullOnMissingStub: true),
-  MockSpec<BottomSheetService>(returnNullOnMissingStub: true),
-  MockSpec<DMApiService>(returnNullOnMissingStub: true),
-  MockSpec<ChannelsApiService>(returnNullOnMissingStub: true),
-  MockSpec<CentrifugeService>(returnNullOnMissingStub: true),
-  MockSpec<ZuriApi>(returnNullOnMissingStub: true),
-  MockSpec<ConnectivityService>(returnNullOnMissingStub: true),
-  MockSpec<JumpToApi>(returnNullOnMissingStub: true),
-  MockSpec<MediaService>(returnNullOnMissingStub: true),
-  MockSpec<OrganizationApiService>(returnNullOnMissingStub: true),
+  MockSpec<UserService>(onMissingStub: null),
+  MockSpec<SharedPreferenceLocalStorage>(onMissingStub: null),
+  MockSpec<NavigationService>(onMissingStub: null),
+  MockSpec<SnackbarService>(onMissingStub: null),
+  MockSpec<ThemeService>(onMissingStub: null),
+  MockSpec<DialogService>(onMissingStub: null),
+  MockSpec<BottomSheetService>(onMissingStub: null),
+  MockSpec<DMApiService>(onMissingStub: null),
+  MockSpec<ChannelsApiService>(onMissingStub: null),
+  MockSpec<CentrifugeService>(onMissingStub: null),
+  MockSpec<ZuriApi>(onMissingStub: null),
+  MockSpec<ConnectivityService>(onMissingStub: null),
+  MockSpec<JumpToApi>(onMissingStub: null),
+  MockSpec<MediaService>(onMissingStub: null),
+  MockSpec<OrganizationApiService>(onMissingStub: null),
 ])
 MockUserService getAndRegisterUserServiceMock({
   bool hasUser = false,
@@ -77,6 +77,7 @@ MockSnackbarService getAndRegisterSnackbarServiceMock(
   _removeRegistrationIfExists<SnackbarService>();
   final service = MockSnackbarService();
   when(service.showCustomSnackBar(
+    message: anyNamed('message'),
     variant: SnackbarType.failure,
   )).thenAnswer((_) => Future.value(userRegistered));
   locator.registerSingleton<SnackbarService>(service);
@@ -86,6 +87,8 @@ MockSnackbarService getAndRegisterSnackbarServiceMock(
 MockThemeService getAndRegisterThemeServiceMock() {
   _removeRegistrationIfExists<ThemeService>();
   final service = MockThemeService();
+  var result = Future.value(const bool.fromEnvironment('Dark Mode'));
+  when(service.selectThemeAtIndex(0)).thenAnswer((realInvocation) => result);
   locator.registerSingleton<ThemeService>(service);
 
   return service;
@@ -139,10 +142,10 @@ MockCentrifugeService getAndRegisterCentrifugeServiceMock() {
   final service = MockCentrifugeService();
   _removeRegistrationIfExists<CentrifugeService>();
   Map eventData = {"some_key": "some_returned_string"};
-  final Future<Stream?> streamtoReturn =
+  final Future<Stream?> streamToReturn =
       Future.value(Stream.fromIterable([eventData]));
   when(service.subscribe("channelSocketID"))
-      .thenAnswer((_) async => streamtoReturn);
+      .thenAnswer((_) async => streamToReturn);
 
   when(service.subscribe("")).thenAnswer((_) => throw Exception(
       "Channel Socket ID is required to subscribe to a channel"));
@@ -158,7 +161,7 @@ MockZuriApi getAndRegisterZuriApiMock() {
   locator.registerSingleton<ZuriApi>(service);
 
   when(service.uploadImage(fileMock,
-          token: token_string, memberId: memberId_string, orgId: orgId_string))
+          token: token_string, pluginId: pluginId_string))
       .thenAnswer((_) async => Future.value("Image Address"));
   return service;
 }
@@ -189,7 +192,8 @@ MockMediaService getAndRegisterMediaServiceMock() {
   final service = MockMediaService();
   Future<String> response = Future<String>.value("Image Address");
 
-  when(service.uploadImage(fileMock)).thenAnswer((_) async => response);
+  when(service.uploadImage(fileMock, pluginId_string))
+      .thenAnswer((_) async => response);
 
   locator.registerSingleton<MediaService>(service);
   return service;

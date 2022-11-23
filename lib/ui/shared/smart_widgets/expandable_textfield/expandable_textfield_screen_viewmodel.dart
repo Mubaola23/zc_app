@@ -1,6 +1,12 @@
+import 'dart:io';
+
+import 'package:zurichat/app/app.locator.dart';
+import 'package:zurichat/services/app_services/media_service.dart';
 import 'package:stacked/stacked.dart';
 
 class ExpandableTextFieldScreenViewModel extends BaseViewModel {
+  final _mediaService = locator<MediaService>();
+  final List<File> _mediaList = [];
   bool isVisible = false;
   bool isExpanded = false;
   double maxSize = 0;
@@ -25,8 +31,8 @@ class ExpandableTextFieldScreenViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  void toggleVisibility(bool _isVisible) {
-    if (!_isVisible) {
+  void toggleVisibility(bool isVisible) {
+    if (!isVisible) {
       isVisible = false;
       size = minSize;
     } else {
@@ -35,4 +41,12 @@ class ExpandableTextFieldScreenViewModel extends BaseViewModel {
     }
     notifyListeners();
   }
+
+  Future<void> onCameraTap(String roomId) async {
+    final media = await _mediaService.getImage(fromGallery: true);
+    _mediaList.add(media!);
+    notifyListeners();
+  }
+
+  List<File> get mediaList => _mediaList;
 }

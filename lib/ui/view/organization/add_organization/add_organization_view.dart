@@ -1,10 +1,15 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/ui/shared/colors.dart';
-import 'package:hng/ui/shared/styles.dart';
-import 'package:hng/utilities/enums.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+import 'package:zurichat/utilities/constants/colors.dart';
+
+import 'package:zurichat/utilities/constants/text_styles.dart';
+import 'package:zurichat/ui/shared/shared.dart';
+import 'package:zurichat/ui/shared/dumb_widgets/zuri_appbar.dart';
+import 'package:zurichat/utilities/enums.dart';
+import 'package:zurichat/utilities/internationalization/app_localization.dart';
 import 'package:stacked/stacked.dart';
+
 import 'add_organization_viewmodel.dart';
 
 //The Add Organization page, where user can add a new organization
@@ -14,6 +19,8 @@ class AddOrganizationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalization.of(context);
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
     return ViewModelBuilder<AddOrganizationViewModel>.reactive(
       //this parameter allows us to reuse the view model to persist the state
       disposeViewModel: false,
@@ -22,39 +29,33 @@ class AddOrganizationView extends StatelessWidget {
       viewModelBuilder: () => AddOrganizationViewModel(),
       builder: (context, model, child) {
         return Scaffold(
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            elevation: 8,
-            shadowColor: Colors.black38,
-            leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios), onPressed: model.back),
-            title: Text(
-              AddOrganisations,
-              style: AppTextStyles.heading4,
+            backgroundColor: dark ? AppColors.blackColor : AppColors.whiteColor,
+            appBar: ZuriAppBar(
+              leading: Icons.arrow_back_ios,
+              orgTitle: Text(
+                local!.addOrganizations,
+                style: AppTextStyle.darkGreySize18Bold.copyWith(
+                    color: Theme.of(context).textTheme.bodyText1!.color),
+              ),
+              isDarkMode: dark,
+              whiteBackground: true,
+              leadingPress: model.back,
             ),
-          ),
-          body: GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: Column(children: [
-              const SizedBox(height: 16),
+            body: Column(children: [
               Container(
                 margin: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(3),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 2,
-                        offset: Offset(0, 2),
-                      ),
-                    ]),
+                  color: dark
+                      ? AppColors.darkThemePrimaryColor
+                      : AppColors.whiteColor,
+                  borderRadius: BorderRadius.circular(3),
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      GestureDetector(
+                      InkWell(
                         onTap: () => model.navigateToSelectEmail(
                             OrganizationSwitchMethod.signIn),
                         child: Padding(
@@ -63,44 +64,48 @@ class AddOrganizationView extends StatelessWidget {
                             children: [
                               const Icon(
                                 Icons.grid_view,
-                                color: AppColors.blackColor,
+                                size: 20,
                               ),
                               const SizedBox(width: 16),
                               Text(
-                                SignInNewOrg,
-                                style: AppTextStyles.body3Medium.copyWith(
-                                    fontSize: 16,
-                                    color: AppColors.zuriTextBodyColor),
+                                local.signInWorkspace,
+                                style: dark
+                                    ? AppTextStyle.whiteSize16
+                                    : AppTextStyle.darkGreySize16,
                               ),
                             ],
                           ),
                         ),
                       ),
                       const Divider(color: AppColors.dividerColor),
-                      GestureDetector(
+                      InkWell(
                         onTap: () => model.navigateToSelectEmail(
                             OrganizationSwitchMethod.join),
                         child: Padding(
                           padding: const EdgeInsets.all(12.0),
                           child: Row(
                             children: [
-                              const Icon(
-                                Icons.add_box_outlined,
-                                color: AppColors.blackColor,
+                              SvgPicture.asset(
+                                Add_Organization,
+                                color: dark
+                                    ? AppColors.whiteColor
+                                    : AppColors.blackColor,
+                                width: 20,
+                                height: 20,
                               ),
                               const SizedBox(width: 16),
                               Text(
-                                JoinAnotherOrg,
-                                style: AppTextStyles.body3Medium.copyWith(
-                                    fontSize: 16,
-                                    color: AppColors.zuriTextBodyColor),
+                                local.joinWorkspace,
+                                style: dark
+                                    ? AppTextStyle.whiteSize16
+                                    : AppTextStyle.darkGreySize16,
                               ),
                             ],
                           ),
                         ),
                       ),
                       const Divider(color: AppColors.dividerColor),
-                      GestureDetector(
+                      InkWell(
                         onTap: () => model.navigateToSelectEmail(
                             OrganizationSwitchMethod.create),
                         child: Padding(
@@ -109,14 +114,14 @@ class AddOrganizationView extends StatelessWidget {
                             children: [
                               const Icon(
                                 Icons.edit_outlined,
-                                color: AppColors.blackColor,
+                                size: 20,
                               ),
                               const SizedBox(width: 16),
                               Text(
-                                CreateNewOrg,
-                                style: AppTextStyles.body3Medium.copyWith(
-                                    fontSize: 16,
-                                    color: AppColors.zuriTextBodyColor),
+                                local.createWorkspace,
+                                style: dark
+                                    ? AppTextStyle.whiteSize16
+                                    : AppTextStyle.darkGreySize16,
                               ),
                             ],
                           ),
@@ -126,9 +131,7 @@ class AddOrganizationView extends StatelessWidget {
                   ),
                 ),
               )
-            ]),
-          ),
-        );
+            ]));
       },
     );
   }

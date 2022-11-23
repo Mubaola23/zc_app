@@ -1,17 +1,18 @@
-import 'package:hng/app/app.logger.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/models/channel_members.dart';
-import 'package:hng/models/channel_model.dart';
-import 'package:hng/package/base/server-request/api/zuri_api.dart';
-import 'package:hng/package/base/server-request/channels/channels_api_service.dart';
-import 'package:hng/services/user_service.dart';
-import 'package:hng/ui/view/channel/channel_members/channel_members_list.dart';
-import 'package:hng/utilities/constants.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:zurichat/app/app.logger.dart';
+import 'package:zurichat/models/channel_members.dart';
+import 'package:zurichat/models/channel_model.dart';
+import 'package:zurichat/services/in_review/user_service.dart';
+import 'package:zurichat/services/messaging_services/channels_api_service.dart';
+import 'package:zurichat/ui/view/channel/channel_members/channel_members_list.dart';
+import 'package:zurichat/utilities/api_handlers/zuri_api.dart';
+import 'package:zurichat/utilities/constants/app_constants.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+
 import '../../../../app/app.locator.dart';
 import '../../../../app/app.router.dart';
-import '../../../../services/local_storage_services.dart';
+import '../../../../services/app_services/local_storage_services.dart';
 import '../../../../utilities/enums.dart';
 
 class ChannelInfoViewModel extends BaseViewModel {
@@ -24,7 +25,9 @@ class ChannelInfoViewModel extends BaseViewModel {
   final _dialogService = locator<DialogService>();
   final log = getLogger('ChannelInfoViewModel');
 
-  String? _channelName;
+  bool notification = true;
+
+  String? channelName;
 
   String? _channelDescription;
 
@@ -38,13 +41,8 @@ class ChannelInfoViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  String get channelName {
-    return _channelName ?? UnnamedChannel;
-  }
-
-  void setChannelName(String channelName) {
-    _channelName = channelName;
-    log.i('pppp $channelDescription');
+  void toggleNotification(bool value) {
+    notification = value;
     notifyListeners();
   }
 
@@ -52,12 +50,16 @@ class ChannelInfoViewModel extends BaseViewModel {
     _navigationService.navigateTo(Routes.editChannelPageView);
   }
 
+  void navigateToPinnedMessages() {
+    _navigationService.navigateTo(Routes.pinnedMessagesView);
+  }
+
   navigateBack() {
     _navigationService.back();
   }
 
   void navigateToMembersList(
-      List<ChannelMembermodel> members, ChannelModel channelDetail) {
+      List<ChannelMember> members, ChannelModel channelDetail) {
     //NavigationService.navigateTo(Routes.cha)
     _navigationService.navigateToView(ChannelMembersList(
       channelMembers: members,
@@ -76,6 +78,7 @@ class ChannelInfoViewModel extends BaseViewModel {
   }
 
   getChannelInfo() async {
+    //TODO LOOK AT THIS PLACE - HARD-CODED CHANNEL ID
     const channel_id = '613f70bd6173056af01b4aba';
     const endpoint = '$ChannelInfoEndpoint$channel_id/';
 
@@ -84,7 +87,6 @@ class ChannelInfoViewModel extends BaseViewModel {
       log.i(response?.data);
       String des = response?.data['description'];
       setChannelDescription(des);
-      setChannelName(channelName);
 
       snackbar.showCustomSnackBar(
         duration: const Duration(seconds: 3),

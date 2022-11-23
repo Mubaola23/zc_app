@@ -1,12 +1,13 @@
-import 'package:hng/constants/app_strings.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+import 'package:zurichat/utilities/internationalization/app_localization.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../../app/app.locator.dart';
 import '../../../../app/app.router.dart';
-import '../../../../services/local_storage_services.dart';
+import '../../../../services/app_services/local_storage_services.dart';
 import '../../../../utilities/enums.dart';
-import '../../../../utilities/storage_keys.dart';
+import '../../../../utilities/constants/storage_keys.dart';
 
 class SelectEmailViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
@@ -16,6 +17,8 @@ class SelectEmailViewModel extends BaseViewModel {
   String? get userEmail => _storage.getString(StorageKeys.currentUserEmail);
 
   String get anotherEmail => _anotherEmail;
+
+  void back() => _navigationService.back();
 
   void onEmailTap(OrganizationSwitchMethod method) {
     switch (method) {
@@ -45,6 +48,10 @@ class SelectEmailViewModel extends BaseViewModel {
     );
   }
 
+  navigateToUseDifferentEmailView() {
+    _navigationService.navigateTo(Routes.useDifferentEmailView);
+  }
+
   void navigateToDifferentEmail(OrganizationSwitchMethod method) {
     _navigationService.navigateTo(
       Routes.useDifferentEmailView,
@@ -52,16 +59,15 @@ class SelectEmailViewModel extends BaseViewModel {
     );
   }
 
-  String getScreenTitle(OrganizationSwitchMethod method) {
+  String getScreenTitle(OrganizationSwitchMethod method, context) {
+    final local = AppLocalization.of(context);
     switch (method) {
       case OrganizationSwitchMethod.create:
-        return CreateWorkspace;
+        return local!.createWorkspace;
       case OrganizationSwitchMethod.signIn:
-        return SignInWorkspace;
+        return local!.signInWorkspace;
       case OrganizationSwitchMethod.join:
-        return JoinWorkspace;
+        return local!.joinWorkspace;
     }
   }
-
-  void back() => _navigationService.popRepeated(1);
 }

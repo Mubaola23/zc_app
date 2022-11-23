@@ -1,8 +1,13 @@
 // ignore_for_file: avoid_print
 
-import 'package:hng/constants/app_strings.dart';
+import 'package:flutter/widgets.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:zurichat/main.dart';
+import 'package:zurichat/services/app_services/localization_service.dart';
+import 'package:zurichat/ui/shared/shared.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+import 'package:zurichat/utilities/extensions/locale_extension.dart';
 
 import '../../../app/app.locator.dart';
 import '../../../app/app.logger.dart';
@@ -11,22 +16,34 @@ import '../../../utilities/enums.dart';
 class LanguageAndRegionModelViewModel extends BaseViewModel {
   final log = getLogger('LanguageAndRegionModelViewModel');
   final _dialogService = locator<DialogService>();
-  String? currentLanguage = 'Espanol (Espana)';
+  final _localizationService = locator<LocalizationService>();
+  final _navigationService = locator<NavigationService>();
+  String? currentLanguage = '';
   String? currentTimeZone = '(UTC+01:00) West Central Africa';
   bool automaticTimeZone = true;
-  int currentValue = 1;
+  int currentValue = 0;
+
+  goBack() => _navigationService.back();
+
+  void initialise() {
+    currentLanguage = _localizationService.appLocale?.getLanguageName();
+  }
 
   List languages = [
     EnglishUS,
-    Deutsch,
-    Espanol,
-    Francais,
-    Italiano,
-    Portugues,
-    Chinese,
+    DeutschDE,
+    ArabicSA,
+    Mandarin,
+    Spanish,
+    Japanese,
+    Hebrew,
+    Italian,
+    PortugueseBrazil
   ];
 
-  Future changeLanguage() async {
+  Future changeLanguage(BuildContext context) async {
+    List locales = supportedLocalesList as List;
+    currentValue = locales.indexOf(_localizationService.appLocale);
     final dialogResult = await _dialogService.showCustomDialog(
       variant: DialogType.selectLanguage,
       data: {'languages': languages, 'currentValue': currentValue},
@@ -35,6 +52,11 @@ class LanguageAndRegionModelViewModel extends BaseViewModel {
     if (dialogResult != null && dialogResult.confirmed == true) {
       currentValue = dialogResult.data;
       currentLanguage = languages[currentValue];
+      Locale? selectedLocale = supportedLocalesList.elementAt(currentValue);
+      _localizationService.storeCurrentLocale(selectedLocale);
+
+      // ignore: use_build_context_synchronously
+      MyApp.setLocale(context, selectedLocale);
 
       log.i(dialogResult.data);
       notifyListeners();

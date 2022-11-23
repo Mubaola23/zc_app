@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:zurichat/utilities/constants/text_styles.dart';
 
-import '../../../../../general_widgets/custom_text.dart';
 import '../../../../../models/user_post.dart';
 
 class Emojis extends StatefulWidget {
@@ -14,10 +14,10 @@ class Emojis extends StatefulWidget {
   final void Function()? checkReact;
 
   @override
-  _EmojisState createState() => _EmojisState();
+  EmojisState createState() => EmojisState();
 }
 
-class _EmojisState extends State<Emojis> with SingleTickerProviderStateMixin {
+class EmojisState extends State<Emojis> with SingleTickerProviderStateMixin {
   Animation<double>? _sizeAnimation;
   AnimationController? _controller;
 
@@ -78,10 +78,9 @@ class _EmojisState extends State<Emojis> with SingleTickerProviderStateMixin {
                     style: TextStyle(fontSize: _sizeAnimation!.value),
                   ),
                   const SizedBox(width: 5),
-                  CustomText(
-                    text: widget.postEmoji.postEmojiCount.toString(),
-                    fontSize: _sizeAnimation!.value,
-                    fontWeight: FontWeight.bold,
+                  Text(
+                    widget.postEmoji.postEmojiCount.toString(),
+                    style: AppTextStyle.darkGreySize16,
                   ),
                   RichText(text: const TextSpan())
                 ],

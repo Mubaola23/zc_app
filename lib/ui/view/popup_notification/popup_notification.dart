@@ -1,8 +1,6 @@
-// import 'dart:ui';
-
 import 'package:flutter/material.dart';
-import 'package:hng/ui/shared/colors.dart';
-import 'package:hng/ui/view/popup_notification/popup_notification_viewmodel.dart';
+import 'package:zurichat/utilities/constants/colors.dart';
+import 'package:zurichat/ui/view/popup_notification/popup_notification_viewmodel.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:stacked/stacked.dart';
 
@@ -75,7 +73,6 @@ class PopUpNotificationsView extends StatelessWidget {
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerDocked,
             floatingActionButton: FloatingActionButton(
-                child: const Icon(Icons.add),
                 backgroundColor: AppColors.zuriPrimaryColor,
                 onPressed: () {
                   showSimpleNotification(
@@ -180,7 +177,8 @@ class PopUpNotificationsView extends StatelessWidget {
                       ),
                     ),
                   );
-                }));
+                },
+                child: const Icon(Icons.add)));
       },
       viewModelBuilder: () => PopupNotificationViewModel(),
     );

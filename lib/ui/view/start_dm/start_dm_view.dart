@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_chips_input/flutter_chips_input.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/ui/shared/shared.dart';
-import 'package:hng/ui/shared/zuri_appbar.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+
+import 'package:zurichat/utilities/constants/text_styles.dart';
+import 'package:zurichat/ui/shared/dumb_widgets/zuri_appbar.dart';
 
 import 'package:stacked/stacked.dart';
 import 'package:stacked/stacked_annotations.dart';
@@ -29,10 +30,15 @@ class StartDmView extends StatelessWidget with $StartDmView {
       viewModelBuilder: () => StartDmViewModel(),
       builder: (ctx, model, child) => Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: Colors.white,
         appBar: ZuriAppBar(
-          orgTitle: Text(DM, style: AppTextStyles.heading7),
+          orgTitle: Text(
+            DM,
+            style: AppTextStyle.darkGreySize20Bold.copyWith(
+              color: Theme.of(context).textTheme.bodyText1!.color,
+            ),
+          ),
           leading: Icons.arrow_back_ios,
+          isDarkMode: Theme.of(context).brightness == Brightness.dark,
           whiteBackground: true,
           leadingPress: () => model.navigateBack(),
           actions: [
@@ -42,9 +48,8 @@ class StartDmView extends StatelessWidget with $StartDmView {
               onPressed: () {},
               child: Text(
                 Done,
-                style: AppTextStyles.heading8.copyWith(
+                style: AppTextStyle.greenSize16.copyWith(
                   letterSpacing: 0.5,
-                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),

@@ -1,33 +1,60 @@
 import 'package:flutter/material.dart';
-import 'package:hng/app/app.locator.dart';
-import 'package:hng/constants/app_strings.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:zurichat/app/app.locator.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+import 'package:zurichat/utilities/internationalization/app_localization.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../../app/app.router.dart';
-import '../../../../general_widgets/easy_container.dart';
-import '../../../../general_widgets/ripple.dart';
-import '../../../../general_widgets/svg_icon.dart';
-import '../../../shared/colors.dart';
-import '../../../shared/text_styles.dart';
+import '../../../shared/dumb_widgets/ripple.dart';
+import '../../../shared/dumb_widgets/svg_icon.dart';
+import '../../../../utilities/constants/colors.dart';
+import '../../../../utilities/constants/text_styles.dart';
 import '../home_item_model.dart';
 import '../home_page_viewmodel.dart';
 
 final navigationService = locator<NavigationService>();
 
-class ThreadTextAndIcon extends StatelessWidget {
+class ThreadTextAndIcon extends ViewModelWidget<HomePageViewModel> {
   const ThreadTextAndIcon({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, viewModel) {
+    final local = AppLocalization.of(context);
     return _TextAndIcon(
-      text: Threads,
+      text: local!.threads,
       unread: true,
-      onTap: () {
+      onTap: () async {
         // Navigate to threads screen
-        navigationService.navigateTo(Routes.threadsView);
+        await navigationService.navigateTo(Routes.threadsView);
+        viewModel.draftChecker();
       },
-      icon: SvgIcon(svgIcon: SvgAssets.threads),
+      icon: SvgIcon(
+        svgIcon: SvgAssets.threads,
+        color: Theme.of(context).textTheme.bodyText1!.color,
+      ),
+    );
+  }
+}
+
+class DraftTextAndIcon extends ViewModelWidget<HomePageViewModel> {
+  const DraftTextAndIcon({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, viewModel) {
+    final local = AppLocalization.of(context);
+    return _TextAndIcon(
+      text: local!.draft,
+      unread: true,
+      onTap: () async {
+        await navigationService.navigateTo(Routes.draftView);
+        viewModel.draftChecker();
+      },
+      icon: SvgIcon(
+        svgIcon: SvgAssets.threads,
+        color: Theme.of(context).textTheme.bodyText1!.color,
+      ),
     );
   }
 }
@@ -37,12 +64,15 @@ class AddChannelsTextAndIcon extends ViewModelWidget<HomePageViewModel> {
 
   @override
   Widget build(BuildContext context, viewModel) {
+    final local = AppLocalization.of(context);
     return _TextAndIcon(
-      text: AddChannels,
+      text: local!.addChannel,
       unread: false,
       onTap: () => viewModel.navigateToCreateChannel(),
-      icon: SvgIcon(
-        svgIcon: SvgAssets.addChannels,
+      icon: SvgPicture.asset(
+        Add_Organization,
+        width: 24,
+        height: 24,
       ),
     );
   }
@@ -53,12 +83,15 @@ class AddTeammatesTextAndIcon extends ViewModelWidget<HomePageViewModel> {
 
   @override
   Widget build(BuildContext context, viewModel) {
+    final local = AppLocalization.of(context);
     return _TextAndIcon(
-      text: AddTeammates,
+      text: local!.addTeammates,
       unread: false,
-      onTap: () => viewModel.navigateToCreateChannel(),
-      icon: SvgIcon(
-        svgIcon: SvgAssets.addChannels,
+      onTap: () => viewModel.navigateInviteMembers(),
+      icon: SvgPicture.asset(
+        Add_Organization,
+        width: 24,
+        height: 24,
       ),
     );
   }
@@ -95,10 +128,12 @@ class DMTextAndIcon extends ViewModelWidget<HomePageViewModel> {
       },
       icon: Container(
         alignment: Alignment.centerLeft,
-        child: const EasyContainer(
+        child: Container(
           height: 23,
           width: 23,
-          radius: 3,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(3),
+          ),
           color: AppColors.paleGreen,
         ),
       ),
@@ -130,26 +165,22 @@ class ChannelTextAndIcon extends ViewModelWidget<HomePageViewModel> {
       if (isUnread) {
         return SvgIcon(
           svgIcon: SvgAssets.hashTag,
-          color: Colors.grey[800],
         );
       }
 
       return SvgIcon(
         svgIcon: SvgAssets.hashTag,
-        color: Colors.grey[600],
       );
     }
 
     if (isUnread) {
       return SvgIcon(
         svgIcon: SvgAssets.locked,
-        color: Colors.grey[800],
       );
     }
 
     return SvgIcon(
       svgIcon: SvgAssets.lockedOutline,
-      color: Colors.grey[600],
     );
   }
 
@@ -192,6 +223,7 @@ class _TextAndIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
     //Expanded tile don't allow sizing so we have to decrease
     //the top pad of the first child to make it look visually ok
     // double topPad = 14;
@@ -217,10 +249,12 @@ class _TextAndIcon extends StatelessWidget {
             Text(
               text,
               style: unread
-                  ? ZuriTextStyle.unreadText()
-                  : ZuriTextStyle.mediumNormal(
-                      color: Colors.grey[600],
-                    ),
+                  ? dark
+                      ? AppTextStyle.whiteSize16Bold
+                      : AppTextStyle.darkGreySize16Bold
+                  : dark
+                      ? AppTextStyle.whiteSize16
+                      : AppTextStyle.lightGreySize16,
             )
           ],
         ),

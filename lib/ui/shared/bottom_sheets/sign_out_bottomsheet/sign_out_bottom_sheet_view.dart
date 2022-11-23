@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:hng/general_widgets/custom_text.dart';
-import 'package:hng/models/organization_model.dart';
-import 'package:hng/ui/shared/bottom_sheets/sign_out_bottomsheet/sign_out_botton_sheet_viewmodel.dart';
-import 'package:hng/ui/shared/bottom_sheets/sign_out_bottomsheet/widgets/work_space_display_info_view.dart';
+
+import 'package:zurichat/models/organization_model.dart';
+import 'package:zurichat/ui/shared/bottom_sheets/sign_out_bottomsheet/sign_out_bottom_sheet_viewmodel.dart';
+import 'package:zurichat/ui/shared/bottom_sheets/sign_out_bottomsheet/widgets/work_space_display_info_view.dart';
+import 'package:zurichat/utilities/constants/text_styles.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
-import '../../colors.dart';
+import '../../../../utilities/constants/colors.dart';
 
 class SignOutBottomSheet extends StatelessWidget {
   final SheetRequest request;
@@ -19,9 +20,10 @@ class SignOutBottomSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final OrganizationModel org = request.data;
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
     return ViewModelBuilder<SignOutBottomSheetViewModel>.nonReactive(
         builder: (context, model, child) => Container(
-              color: AppColors.whiteColor,
+              color: dark ? AppColors.darkModeColor : AppColors.whiteColor,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -31,20 +33,54 @@ class SignOutBottomSheet extends StatelessWidget {
                     workSpaceSlackUrl: org.organizationUrl,
                   ),
                   GestureDetector(
+                    onTap: () => model.navigateInviteMembers(),
+                    child: ListTile(
+                      title: Text(
+                        'Invite members',
+                        style: dark
+                            ? AppTextStyle.whiteSize16
+                            : AppTextStyle.darkGreySize16,
+                      ),
+                      leading: Icon(
+                        Icons.logout_sharp,
+                        color:
+                            dark ? AppColors.whiteColor : AppColors.greyColor,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      model.navigateToWorkSpaceSettings(org);
+                    },
+                    child: ListTile(
+                      title: Text(
+                        'Organization settings',
+                        style: dark
+                            ? AppTextStyle.whiteSize16
+                            : AppTextStyle.darkGreySize16,
+                      ),
+                      leading: Icon(
+                        Icons.settings,
+                        color:
+                            dark ? AppColors.whiteColor : AppColors.greyColor,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
                     onTap: () {
                       model.dismissDialog();
                       model.showSignOutDialog(org.name ?? "");
                     },
-                    child: const ListTile(
-                      title: CustomText(
-                        text: 'Sign Out',
-                        fontWeight: FontWeight.w700,
-                        fontSize: 16,
-                        color: AppColors.zuriPrimaryColor,
+                    child: ListTile(
+                      title: Text(
+                        'Sign Out',
+                        style: dark
+                            ? AppTextStyle.whiteSize16
+                            : AppTextStyle.darkGreySize16,
                       ),
-                      leading: Icon(
+                      leading: const Icon(
                         Icons.logout_sharp,
-                        color: AppColors.zuriPrimaryColor,
+                        color: AppColors.unreadMessageColor,
                       ),
                     ),
                   )

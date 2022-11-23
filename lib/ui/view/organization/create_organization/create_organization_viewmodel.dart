@@ -1,13 +1,13 @@
-import 'package:hng/app/app.logger.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/package/base/server-request/channels/channels_api_service.dart';
+import 'package:zurichat/app/app.logger.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+import 'package:zurichat/services/messaging_services/channels_api_service.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../../app/app.locator.dart';
 import '../../../../app/app.router.dart';
 import '../../../../models/organization_model.dart';
-import '../../../../package/base/server-request/organization_request/organization_api_service.dart';
+import '../../../../services/core_services/organization_api_service.dart';
 import '../../../../utilities/enums.dart';
 
 class CreateOrganizationViewModel extends BaseViewModel {
@@ -24,8 +24,8 @@ class CreateOrganizationViewModel extends BaseViewModel {
 
   late String email = '';
 
-  void init(String _email) {
-    email = _email;
+  void init(String email) {
+    email = email;
   }
 
   void back() => _navigation.back();
@@ -72,6 +72,7 @@ class CreateOrganizationViewModel extends BaseViewModel {
       log.e(e.toString());
       snackbar.showSnackbar(message: e.toString());
     }
+    return null;
   }
 
   Future<bool> onCompanyNext() async {

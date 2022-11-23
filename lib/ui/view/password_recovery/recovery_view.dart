@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
-import 'package:hng/general_widgets/custom_textfield.dart';
-import 'package:hng/ui/view/password_recovery/recovery_viewmodel.dart';
+import 'package:zurichat/ui/shared/dumb_widgets/custom_textfield.dart';
+import 'package:zurichat/ui/view/password_recovery/recovery_viewmodel.dart';
 
 class ForgotPassView extends StatelessWidget {
   const ForgotPassView({Key? key}) : super(key: key);
@@ -54,15 +54,15 @@ class ForgotPassView extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: ElevatedButton(
                   onPressed: () {},
-                  child: const Text('Continue'),
                   style: ElevatedButton.styleFrom(
-                    primary: const Color(0xff00B87C),
-                    onPrimary: Colors.white,
+                    backgroundColor: const Color(0xff00B87C),
+                    foregroundColor: Colors.white,
                     minimumSize: const Size(340.0, 48.0),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
+                  child: const Text('Continue'),
                 ),
               ),
             ],

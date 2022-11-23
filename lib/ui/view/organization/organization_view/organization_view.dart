@@ -1,8 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/models/organization_model.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+import 'package:zurichat/models/organization_model.dart';
+import 'package:zurichat/utilities/constants/text_styles.dart';
+import 'package:zurichat/ui/shared/dumb_widgets/zuri_loader.dart';
+import 'package:zurichat/utilities/internationalization/app_localization.dart';
 import 'package:stacked/stacked.dart';
-import '../../../../models/organization_model.dart';
 import '../../../shared/shared.dart';
 import 'organization_viewmodel.dart';
 
@@ -11,6 +14,10 @@ class OrganizationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalization.of(context);
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
+    TextStyle tileStyle =
+        dark ? AppTextStyle.whiteSize16 : AppTextStyle.darkGreySize16;
     return ViewModelBuilder<OrganizationViewModel>.reactive(
       onModelReady: (viewModel) => viewModel.initViewModel(),
       disposeViewModel: false,
@@ -22,48 +29,57 @@ class OrganizationView extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(Organizations,
-                      style: AppTextStyles.heading6
-                          .copyWith(color: AppColors.blackColor)),
+                  Text(
+                    local!.workspaces,
+                    style: dark
+                        ? AppTextStyle.bigWhiteText
+                        : AppTextStyle.bigBlackText,
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
+                  ),
                   Expanded(
                     child: Visibility(
                       visible: !viewModel.isBusy,
-                      child: SingleChildScrollView(
-                        physics: const ScrollPhysics(),
-                        child: viewModel.organizations.isEmpty
-                            ? Center(
-                                child: Container(
-                                  alignment: Alignment.center,
-                                  padding: const EdgeInsets.only(top: 50.0),
-                                  child: Text(
-                                    NotJoinedOrgYet,
-                                    style: AppTextStyles.bodyRegular,
+                      replacement: const Center(child: ZuriLoader()),
+                      child: RefreshIndicator(
+                        color: AppColors.zuriPrimaryColor,
+                        onRefresh: viewModel.initViewModel,
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: viewModel.organizations.isEmpty
+                              ? Center(
+                                  child: Container(
+                                    alignment: Alignment.center,
+                                    padding: const EdgeInsets.only(top: 50.0),
+                                    child: Text(
+                                      local.notJoinedOrg,
+                                      style: dark
+                                          ? AppTextStyle.whiteSize14
+                                          : AppTextStyle.darkGreySize14,
+                                    ),
                                   ),
-                                ),
-                              )
-                            : Column(
-                                children: [
-                                  SizedBox(
-                                    height: MediaQuery.of(context).size.height *
-                                        0.005,
-                                  ),
-                                  ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemCount: viewModel.organizations.length,
-                                    shrinkWrap: true,
-                                    itemBuilder: (context, i) {
-                                      final org = viewModel.organizations[i];
+                                )
+                              : Column(
+                                  children: [
+                                    SizedBox(
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.005,
+                                    ),
+                                    ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: viewModel.organizations.length,
+                                      shrinkWrap: true,
+                                      itemBuilder: (context, i) {
+                                        final org = viewModel.organizations[i];
 
-                                      return OrganizationTile(org: org);
-                                    },
-                                  ),
-                                ],
-                              ),
-                      ),
-                      replacement: const Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.zuriPrimaryColor,
+                                        return OrganizationTile(org: org);
+                                      },
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                     ),
@@ -77,9 +93,8 @@ class OrganizationView extends StatelessWidget {
                           leading: const Icon(Icons.add_box_outlined),
                           contentPadding: EdgeInsets.zero,
                           title: Text(
-                            AddOrg,
-                            style: AppTextStyles.faintBodyText
-                                .copyWith(fontSize: 16),
+                            local.addOrg,
+                            style: tileStyle,
                           ),
                         ),
                         ListTile(
@@ -87,25 +102,31 @@ class OrganizationView extends StatelessWidget {
                           leading: const Icon(Icons.settings),
                           contentPadding: EdgeInsets.zero,
                           title: Text(
-                            Preferences,
-                            style: AppTextStyles.faintBodyText
-                                .copyWith(fontSize: 16),
+                            local.preferences,
+                            style: tileStyle,
                           ),
                         ),
+                        // ListTile(
+                        //   leading: const Icon(Icons.help_outline),
+                        //   contentPadding: EdgeInsets.zero,
+                        //   title: Text(
+                        //     local.help,
+                        //     style: _tileStyle,
+                        //   ),
+                        // ),
                         ListTile(
-                          leading: const Icon(Icons.help_outline),
-                          contentPadding: EdgeInsets.zero,
-                          title: Text(Help,
-                              style: AppTextStyles.faintBodyText
-                                  .copyWith(fontSize: 16)),
-                        ),
-                        ListTile(
+                          ///TODO THERE SHOULD BE A DIALOG TO INFORM THE USERS THAT THIS ACTION WILL CLEAR
+                          ///ALL THEIR DETAILS - AND YOU WILL LIST THEM OUT
+                          ///LIKE SAVED ITEMS, PERSONAL INFORMATION ETC.
+                          ///AND WHEN THE USER AGREES, THEN THIS FUNCTION SHOULD BE EXECUTED.
+                          ///TODO
                           onTap: () => viewModel.signOutAllOrg(),
                           leading: const Icon(Icons.logout_sharp),
                           contentPadding: EdgeInsets.zero,
-                          title: Text(SignOutAccount,
-                              style: AppTextStyles.faintBodyText
-                                  .copyWith(fontSize: 16)),
+                          title: Text(
+                            local.signOutAccount,
+                            style: tileStyle,
+                          ),
                         ),
                       ],
                     ),
@@ -131,38 +152,42 @@ class OrganizationTile extends ViewModelWidget<OrganizationViewModel> {
 
   @override
   Widget build(BuildContext context, OrganizationViewModel viewModel) {
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
+
     return ListTile(
-        onTap: () => viewModel.onTap(
-            org.id, org.name, org.organizationUrl, org.userIdInOrg),
+        onTap: () => viewModel.onTap(org),
         leading: Container(
           height: MediaQuery.of(context).size.height * 0.06,
           width: MediaQuery.of(context).size.height * 0.06,
           padding: const EdgeInsets.all(2),
           decoration: BoxDecoration(
             color: viewModel.currentOrgId == org.id
-                ? AppColors.blackColor
-                : AppColors.whiteColor,
+                ? Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.whiteColor
+                    : AppColors.blackColor
+                : Theme.of(context).brightness == Brightness.dark
+                    ? AppColors.blackColor
+                    : AppColors.whiteColor,
             borderRadius: BorderRadius.circular(5),
           ),
           child: Container(
             height: MediaQuery.of(context).size.height * 0.05,
             width: MediaQuery.of(context).size.height * 0.05,
             decoration: BoxDecoration(
-              border: Border.all(
-                color: AppColors.whiteColor,
-                width: 2,
-                style: BorderStyle.solid,
-              ),
-              color: AppColors.greyishColor,
+              color: !dark ? AppColors.darkModeColor : AppColors.whiteColor,
               borderRadius: BorderRadius.circular(5),
             ),
-            clipBehavior: Clip.antiAlias,
+            clipBehavior: Clip.hardEdge,
             //TODO : Add the org image here
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.05,
-              width: MediaQuery.of(context).size.width * 0.5,
-              color: Colors.grey,
-            ),
+            child: org.logoUrl != null && org.logoUrl!.isNotEmpty
+                ? CachedNetworkImage(
+                    imageUrl: org.logoUrl!,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    NewZuriLogo,
+                    fit: BoxFit.cover,
+                  ),
           ),
         ),
         //TODO : Add the org name here
@@ -171,16 +196,16 @@ class OrganizationTile extends ViewModelWidget<OrganizationViewModel> {
           overflow: TextOverflow.ellipsis,
           softWrap: false,
           maxLines: 2,
-          style: AppTextStyles.heading7.copyWith(
-            fontSize: MediaQuery.of(context).size.height * 0.02,
-          ),
+          style: dark
+              ? AppTextStyle.whiteSize16Bold
+              : AppTextStyle.darkGreySize16Bold,
         ),
         contentPadding: EdgeInsets.zero,
         subtitle: Container(
           padding: const EdgeInsets.only(top: 5.0),
           child: Text(
             org.organizationUrl ?? '',
-            style: AppTextStyles.body3Medium,
+            style: AppTextStyle.lightGreySize14,
           ),
         ),
         trailing: GestureDetector(

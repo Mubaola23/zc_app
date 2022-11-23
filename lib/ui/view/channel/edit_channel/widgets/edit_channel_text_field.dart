@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:hng/ui/shared/colors.dart';
+import 'package:zurichat/utilities/constants/colors.dart';
 
 class TextBox extends StatelessWidget {
   final String hint;

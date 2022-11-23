@@ -1,17 +1,18 @@
-import 'package:hng/app/app.logger.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/package/base/server-request/api/zuri_api.dart';
-import 'package:hng/services/user_service.dart';
-import 'package:hng/utilities/constants.dart';
+import 'package:zurichat/app/app.logger.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
+import 'package:zurichat/models/user_model.dart';
+import 'package:zurichat/utilities/api_handlers/zuri_api.dart';
+import 'package:zurichat/services/in_review/user_service.dart';
+import 'package:zurichat/utilities/constants/app_constants.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../app/app.locator.dart';
 import '../../../app/app.router.dart';
-import '../../../services/connectivity_service.dart';
-import '../../../services/local_storage_services.dart';
+import '../../../services/app_services/connectivity_service.dart';
+import '../../../services/app_services/local_storage_services.dart';
 import '../../../utilities/enums.dart';
-import '../../../utilities/storage_keys.dart';
+import '../../../utilities/constants/storage_keys.dart';
 import 'login_view.form.dart';
 
 class LoginViewModel extends FormViewModel {
@@ -22,6 +23,7 @@ class LoginViewModel extends FormViewModel {
   final storageService = locator<SharedPreferenceLocalStorage>();
   final _userService = locator<UserService>();
   final zuriApi = ZuriApi(coreBaseUrl);
+  late UserModel userModel;
 
   final log = getLogger('LogInViewModel');
 
@@ -74,7 +76,6 @@ class LoginViewModel extends FormViewModel {
         variant: SnackbarType.failure,
         message: fillAllFields,
       );
-
       return;
     }
     final response = await zuriApi.login(
@@ -97,8 +98,17 @@ class LoginViewModel extends FormViewModel {
         response?.data['data']['user']['email'],
       );
       _storageService.clearData(StorageKeys.currentOrgId);
-      // final userModel = UserModel.fromJson(response?.data['data']['user']);
-
+      final userModel = UserModel.fromJson(response?.data['data']['user']);
+      // final res = await zuriApi
+      //     .get("${coreBaseUrl}users/${response?.data['data']['user']['id']}");
+      // if (res?.statusCode == 200) {
+      //   _snackbarService.showCustomSnackBar(
+      //       message: profileUpdated, variant: SnackbarType.success);
+      _userService.setUserDetails(userModel);
+      // } else {
+      //   _snackbarService.showCustomSnackBar(
+      //       message: errorOccurred, variant: SnackbarType.failure);
+      // }
       _snackbarService.showCustomSnackBar(
         duration: const Duration(milliseconds: 1500),
         variant: SnackbarType.success,

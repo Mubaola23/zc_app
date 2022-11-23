@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hng/constants/app_strings.dart';
-import 'package:hng/ui/shared/shared.dart';
+import 'package:zurichat/utilities/constants/app_strings.dart';
 
-import '../../../../utilities/constants.dart';
+import 'package:zurichat/utilities/constants/text_styles.dart';
+
+import '../../../../utilities/constants/app_constants.dart';
 
 class ZuriLogo extends StatelessWidget {
   const ZuriLogo({
@@ -21,7 +22,7 @@ class ZuriLogo extends StatelessWidget {
         const SizedBox(
           width: 5,
         ),
-        Text(zuri, style: AppTextStyles.zuriAppBarWordLogo),
+        Text(zuri, style: AppTextStyle.zuriAppBarWordLogo),
       ],
     );
   }

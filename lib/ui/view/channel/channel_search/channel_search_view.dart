@@ -1,26 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:hng/ui/shared/zuri_appbar.dart';
+import 'package:zurichat/ui/shared/dumb_widgets/zuri_appbar.dart';
+import 'package:zurichat/utilities/internationalization/app_localization.dart';
 import 'package:stacked/stacked.dart';
 
 import 'channel_search_view_model.dart';
 import 'widgets/search_result.dart';
 import 'widgets/textfield_style.dart';
 
-class ChannelSearchPageView extends StatefulWidget {
-  const ChannelSearchPageView({Key? key}) : super(key: key);
+class ChannelSearchPageView extends StatelessWidget {
+  final String? channelName;
+  const ChannelSearchPageView({Key? key, this.channelName}) : super(key: key);
 
-  @override
-  _ChannelSearchPageViewState createState() => _ChannelSearchPageViewState();
-}
-
-class _ChannelSearchPageViewState extends State<ChannelSearchPageView> {
   @override
   Widget build(BuildContext context) {
+    final local = AppLocalization.of(context);
     return ViewModelBuilder<ChannelSearchViewModel>.reactive(
       builder: (context, model, child) => Scaffold(
         appBar: ZuriAppBar(
           isSearchBar: true,
-          hintText: 'Search for people here',
+          hintText: local!.searchPeopleHere,
           searchBarIcon: Icons.arrow_back_ios,
           leadingWidth: true,
 
@@ -39,8 +37,8 @@ class _ChannelSearchPageViewState extends State<ChannelSearchPageView> {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 30),
                   child: TextFormField(
                       // style: textStyling(),
-                      decoration:
-                          textFormFields('Search people on #teamsocrates')),
+                      decoration: textFormFields(
+                          '${local.searchPeopleOn} $channelName')),
                 ),
 
                 const SizedBox(child: SearchResults()),
